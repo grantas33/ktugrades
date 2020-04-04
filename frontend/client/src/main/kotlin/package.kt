@@ -11,6 +11,10 @@ sealed class ServiceWorkerState {
     object Loading: ServiceWorkerState()
 }
 
+enum class PushManagerState {
+    Loading, Subscribed, NotSubscribed
+}
+
 data class PushSubscriptionOptions(val userVisibleOnly: Boolean, val applicationServerKey: IntArray)
 
 external class PushSubscription {

@@ -15,18 +15,18 @@ interface MainPageProps: RProps {
     var pushManager: PushManager
 }
 interface MainPageState: RState {
-    var isSubscribedToPush: Boolean
+    var pushManagerState: PushManagerState
 }
 
 class MainPage: RComponent<MainPageProps, MainPageState>() {
 
     override fun MainPageState.init() {
-        isSubscribedToPush = false
+        pushManagerState = PushManagerState.Loading
 
         MainScope().launch {
             props.pushManager.getSubscription().await().let {
                 setState {
-                    isSubscribedToPush = it != null
+                    pushManagerState = if (it != null) PushManagerState.Subscribed else PushManagerState.NotSubscribed
                 }
             }
         }
@@ -41,7 +41,7 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
             sendSubscriptionToServer(subscription)
             console.log("Subscribed.")
             setState {
-                isSubscribedToPush = true
+                pushManagerState = PushManagerState.Subscribed
             }
         } catch (e: Exception) {
             console.warn("Subscription denied.")
@@ -66,17 +66,17 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
 
     override fun RBuilder.render() {
         flexBox {
-            if (state.isSubscribedToPush) {
-                h1 {
+            when (state.pushManagerState) {
+                PushManagerState.Subscribed -> h1 {
                     +"Grades"
                 }
-            } else {
-                styledButton {
+                PushManagerState.NotSubscribed -> styledButton {
                     attrs {
                         onClickFunction = { subscribeUser() }
                     }
-                    +"Subscribe to push notifications to use this app."
+                    +"Subscribe to push notifications to receive a notification on this device upon receiving a mark."
                 }
+                PushManagerState.Loading -> loadingComponent()
             }
         }
     }

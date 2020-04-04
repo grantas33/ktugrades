@@ -7,12 +7,14 @@ import kotlin.browser.window
 
 interface AppState: RState {
     var serviceWorkerState: ServiceWorkerState
+    var localStorageChangeSwitch: Boolean
 }
 
 class App: RComponent<RProps, AppState>() {
 
     override fun AppState.init() {
         serviceWorkerState = ServiceWorkerState.Loading
+        localStorageChangeSwitch = false
 
         MainScope().launch {
             try {
@@ -37,16 +39,14 @@ class App: RComponent<RProps, AppState>() {
                             pushManager = (state.serviceWorkerState as ServiceWorkerState.Registered).swRegistration.pushManager
                         }
                     } else {
-                        loginPage()
+                        loginPage {
+                            notifyLocalStorageUpdated = { setState { localStorageChangeSwitch = state.localStorageChangeSwitch.not()  } }
+                        }
                     }
-                ServiceWorkerState.Failed ->
-                    h1 {
-                        +"Error in registering service worker"
-                    }
-                ServiceWorkerState.Loading ->
-                    h1 {
-                        +"Loading"
-                    }
+                ServiceWorkerState.Failed -> h1 {
+                    +"Error in registering service worker"
+                }
+                ServiceWorkerState.Loading -> loadingComponent()
             }
         }
     }

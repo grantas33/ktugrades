@@ -3,6 +3,7 @@ import kotlinx.html.BUTTON
 import kotlinx.html.DIV
 import react.RBuilder
 import react.dom.RDOMBuilder
+import react.dom.h1
 import styled.css
 import styled.styledButton
 import styled.styledDiv
@@ -30,5 +31,9 @@ fun RBuilder.appButton(block: RDOMBuilder<BUTTON>.() -> Unit) = styledButton {
         fontFamily = "pf-dintext-promedium"
     }
     block()
+}
+
+fun RBuilder.loadingComponent() = h1 {
+    +"Loading"
 }
 

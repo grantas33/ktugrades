@@ -11,7 +11,10 @@ import org.w3c.dom.HTMLInputElement
 import org.w3c.fetch.RequestInit
 import react.*
 import styled.*
+import kotlin.browser.localStorage
 import kotlin.browser.window
+
+interface LoginPageProps: RProps, LocalStorageProps
 
 interface LoginPageState: RState {
     var username: String
@@ -19,7 +22,7 @@ interface LoginPageState: RState {
     var errorMessage: String?
 }
 
-class LoginPage: RComponent<RProps, LoginPageState>() {
+class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
 
     override fun LoginPageState.init() {
         username = ""
@@ -34,7 +37,9 @@ class LoginPage: RComponent<RProps, LoginPageState>() {
         )).await().let {
             if (it.ok) {
                 val encrypted = it.json().await().unsafeCast<AuthenticationResponse>()
-                console.log(encrypted)
+                localStorage.setItem("username", encrypted.username.contentToString())
+                localStorage.setItem("password", encrypted.password.contentToString())
+                props.notifyLocalStorageUpdated()
             } else {
                 val error = it.json().await().unsafeCast<ErrorMessage>()
                 setState {
@@ -116,5 +121,9 @@ class LoginPage: RComponent<RProps, LoginPageState>() {
     }
 }
 
-fun RBuilder.loginPage(): ReactElement = child(LoginPage::class) {}
+fun RBuilder.loginPage(handler: LoginPageProps.() -> Unit): ReactElement {
+    return child(LoginPage::class) {
+        this.attrs(handler)
+    }
+}
 
