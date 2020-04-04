@@ -1,8 +1,6 @@
 import kotlinx.coroutines.*
-import org.w3c.dom.get
 import react.*
 import react.dom.h1
-import kotlin.browser.localStorage
 import kotlin.browser.window
 
 interface AppState: RState {
@@ -30,17 +28,22 @@ class App: RComponent<RProps, AppState>() {
         }
     }
 
+    private fun onLocalStorageUpdate() {
+        setState { localStorageChangeSwitch = state.localStorageChangeSwitch.not() }
+    }
+
     override fun RBuilder.render() {
         flexBox {
             when (state.serviceWorkerState) {
                 is ServiceWorkerState.Registered ->
-                    if (localStorage["username"]?.length ?: 0 > 0 && localStorage["password"]?.length ?: 0 > 0) {
+                    if (isCredentialsExisting()) {
                         mainPage {
                             pushManager = (state.serviceWorkerState as ServiceWorkerState.Registered).swRegistration.pushManager
+                            notifyLocalStorageUpdated = { onLocalStorageUpdate() }
                         }
                     } else {
                         loginPage {
-                            notifyLocalStorageUpdated = { setState { localStorageChangeSwitch = state.localStorageChangeSwitch.not()  } }
+                            notifyLocalStorageUpdated = { onLocalStorageUpdate() }
                         }
                     }
                 ServiceWorkerState.Failed -> h1 {

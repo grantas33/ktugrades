@@ -1,5 +1,7 @@
 import org.khronos.webgl.ArrayBuffer
+import org.w3c.dom.get
 import org.w3c.workers.ServiceWorkerRegistration
+import kotlin.browser.localStorage
 import kotlin.js.Promise
 
 const val PUSH_API_PUBLIC_KEY = "BF2T7idzBuyRT3i6RhfObqIW0DbSC7vnbFV6GRyDBq39pO6VL9LMw3yp3iQbzxQagbcSBomrUBQk7qzFMT_bM94"
@@ -46,3 +48,5 @@ inline fun jsObject(init: dynamic.() -> Unit): dynamic {
 }
 
 val applicationJsonHeaders = jsObject { this["Content-type"] = "application/json" }
+
+fun isCredentialsExisting() = localStorage["username"]?.length ?: 0 > 0 && localStorage["password"]?.length ?: 0 > 0

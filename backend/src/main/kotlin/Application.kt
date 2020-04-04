@@ -23,6 +23,7 @@ import io.ktor.routing.post
 import io.ktor.routing.routing
 import kotlinx.coroutines.withContext
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.ktugrades.common.SubscriptionPayload
 import java.security.Security
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -68,6 +69,8 @@ fun Application.module(testing: Boolean = false) {
             call.respond(HttpStatusCode.BadRequest, ErrorMessage("Authentication failed."))
         }
         post ("/subscription") {
+            val payload = call.receive<SubscriptionPayload>()
+            dependencies.mySqlProvider.insertUserSubscription(payload)
             call.respond(HttpStatusCode.OK)
         }
     }
