@@ -1,0 +1,18 @@
+{
+  "short_name": "Grades",
+  "name": "Grade tracker",
+  "description": "Grade tracker for KTU",
+  "icons": [
+    {
+      "src": "ktu-ikona.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "/",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#FFFFFF"
+}

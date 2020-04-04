@@ -1,0 +1,19 @@
+ktor {
+    deployment {
+        port = 5000
+    }
+    application {
+        modules = [ org.ktugrades.backend.ApplicationKt.module ]
+    }
+}
+
+database {
+    url = ""
+    driver = ""
+    user = ""
+    password = ""
+}
+
+encryption {
+    key = ""
+}
