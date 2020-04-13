@@ -1,79 +1,60 @@
 package org.ktugrades.backend.handlers
 
-import org.jsoup.Connection
+import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.url
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.readText
+import io.ktor.http.Parameters
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import org.ktugrades.backend.getClient
 import org.ktugrades.backend.models.MarkModel
 import org.ktugrades.backend.models.ModuleModel
-import org.ktugrades.backend.models.YearModel
-
-/**
- * Created by simonas on 9/3/17.
- */
 
 class DataHandler {
 
-    fun getGrades(studCookie: String, planYear: YearModel)
-            = getGrades(studCookie, planYear.year, planYear.id)
+    suspend fun getGrades(planYear: String, studId: String): List<MarkModel> =
+        getModules(planYear, studId).map {
+            getModuleMarkList(it)
+        }.flatten()
 
-    fun getGrades(studCookie: String, planYear: String, studId: String): List<MarkModel> {
-        val markList = mutableListOf<MarkModel>()
-        val moduleList = getModules(studCookie, planYear, studId)
-
-        moduleList.forEach { moduleModel ->
-            val moduleMarkList = getModuleMarkList(moduleModel, studCookie)
-            markList.addAll(moduleMarkList)
-        }
-
-        return markList
-    }
-
-    fun getModules(studCookie: String, planYear: String, studId: String): List<ModuleModel> {
+    suspend fun getModules(planYear: String, studId: String): List<ModuleModel> {
         val url = "https://uais.cr.ktu.lt/ktuis/STUD_SS2.planas_busenos?" +
                 "plano_metai=$planYear&" +
                 "p_stud_id=$studId"
 
-        val request = Jsoup.connect(url)
-                .cookie("STUDCOOKIE", studCookie)
-                .method(Connection.Method.GET)
-                .execute()
-
-        request.charset("windows-1257")
-        val parse = request.parse()
-
-        val moduleList = mutableListOf<ModuleModel>()
-
-        val moduleTable = parse.select(".table.table-hover > tbody > tr")
-        if (moduleTable.size > 0) {
-            moduleTable.forEach { moduleElement ->
-                val model = ModuleModel(moduleElement)
-                moduleList.add(model)
-            }
+        val parsed = getClient().get<HttpResponse> {
+            url(url)
+        }.let {
+            Jsoup.parse(it.readText())
         }
 
-        return moduleList
+        val moduleTable = parsed.select(".table.table-hover > tbody > tr")
+        return moduleTable.map { moduleElement ->
+            ModuleModel(moduleElement)
+        }
     }
 
-    private fun getModuleMarkList(moduleModel: ModuleModel, studCookie: String): List<MarkModel> {
+    private suspend fun getModuleMarkList(moduleModel: ModuleModel): List<MarkModel> {
         val markList = mutableListOf<MarkModel>()
         val url = "https://uais.cr.ktu.lt/ktuis/STUD_SS2.infivert"
 
-        val request = Jsoup.connect(url)
-                .cookie("STUDCOOKIE", studCookie)
-                .method(Connection.Method.POST)
-                .data(mapOf(
-                        "p1" to moduleModel.p1,
-                        "p2" to moduleModel.p2,
-                        "p3" to moduleModel.p3
-                ))
-                .execute()
+        val parsed = getClient().post<HttpResponse> {
+            url(url)
+            body = FormDataContent(Parameters.build {
+                append("p1", requireNotNull(moduleModel.p1))
+                append("p2", requireNotNull(moduleModel.p2))
+                append("p3", requireNotNull(moduleModel.p3))
+            })
+        }.let {
+            Jsoup.parse(it.readText())
+        }
 
-        request.charset("windows-1257")
-        val parse = request.parse()
-
-        val markTable = parse.select(".d_grd2[style=\"border-collapse:collapse; empty-cells:hide;\"]").firstOrNull()
-        val markInfoTable = parse.select(".d_grd2[style=\"border-collapse:collapse; table-layout:fixed; width:450px;\"]").firstOrNull()
-        val headerInfo = parse.select("blockquote").select("p")
+        val markTable = parsed.select(".d_grd2[style=\"border-collapse:collapse; empty-cells:hide;\"]").firstOrNull()
+        val markInfoTable = parsed.select(".d_grd2[style=\"border-collapse:collapse; table-layout:fixed; width:450px;\"]").firstOrNull()
+        val headerInfo = parsed.select("blockquote").select("p")
 
         if (markTable != null && markInfoTable != null) {
             val markTypeIdList: List<String> = getMarkTypeIdList(markTable)
@@ -85,12 +66,12 @@ class DataHandler {
             (0 until markWeekList.size-1).forEach { index ->
                 if (markTypeIdList[index] != " ") {
                     val markModel = MarkModel(
-                            name = moduleModel.module_name,
-                            id = moduleModel.module_code,
+                            name = moduleModel.moduleName,
+                            id = moduleModel.moduleCode,
                             semester = moduleModel.semester,
-                            module_code = moduleModel.module_code,
-                            module_name = moduleModel.module_name,
-                            semester_number = moduleModel.semester_number,
+                            moduleCode = moduleModel.moduleCode,
+                            moduleName = moduleModel.moduleName,
+                            semesterNumber = moduleModel.semesterNumber,
                             credits = moduleModel.credits,
                             language = moduleModel.language,
                             professor = professorText,

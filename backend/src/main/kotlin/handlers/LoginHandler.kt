@@ -11,9 +11,7 @@ import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readText
 import io.ktor.http.*
-import org.jsoup.Connection
 import org.jsoup.Jsoup
-import java.lang.RuntimeException
 
 class LoginHandler {
 
@@ -84,7 +82,13 @@ class LoginHandler {
         return null
     }
 
-    private suspend fun getInfo(cookie: String): LoginModel {
+    public suspend fun setEnglishLanguageForClient(): Unit {
+        getClient().get<HttpResponse> {
+            url("https://uais.cr.ktu.lt/ktuis/vs.pirmas?p_lang=ENG")
+        }
+    }
+
+    public suspend fun getInfo(): LoginModel {
         val call = getClient().get<HttpResponse> {
             url("https://uais.cr.ktu.lt/ktuis/vs.ind_planas")
         }
@@ -114,7 +118,6 @@ class LoginHandler {
         val weekRegex = "(?:selected\\>)([0-9]*)".toRegex()
         val currentWeek = weekRegex.find(currentWeekElement.toString())!!.groupValues[1]
         return LoginModel(
-                studCookie = cookie,
                 studentName =studentName,
                 studentId = studentId,
                 currentWeek = currentWeek,

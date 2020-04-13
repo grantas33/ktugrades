@@ -5,7 +5,6 @@ package org.ktugrades.backend.models
  */
 
 data class LoginModel(
-        val studCookie: String,
         val studentName: String,
         val studentId: String,
         val currentWeek: String,

@@ -26,4 +26,21 @@ class MySqlProvider(val connection: SuspendingConnection) {
             values = listOf(payload.username, payload.endpoint, payload.key, payload.auth)
         )
     }
+
+    suspend fun getUserSubscriptions(): List<SubscriptionPayload> = connection.inTransaction {
+        it.sendPreparedStatement(
+            query = """
+                select * from UserSubscriptions
+            """.trimIndent()
+        ).let {
+            it.rows.map {
+                SubscriptionPayload(
+                    username = it["userId"] as ByteArray,
+                    endpoint = it["endpoint"] as String,
+                    key = it["publicKey"] as String,
+                    auth = it["auth"] as String
+                )
+            }
+        }
+    }
 }

@@ -35,10 +35,9 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
     }
 
     private fun subscribeUser() = GlobalScope.launch {
-        val encoded = toUint8Array(PUSH_API_PUBLIC_KEY)
         try {
             val subscription = props.pushManager.subscribe(
-                PushSubscriptionOptions(userVisibleOnly = true, applicationServerKey = encoded)
+                PushSubscriptionOptions(userVisibleOnly = true, applicationServerKey = PUSH_API_PUBLIC_KEY)
             ).await()
             sendSubscriptionToServer(subscription)
             console.log("Subscribed.")

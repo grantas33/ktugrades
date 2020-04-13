@@ -22,8 +22,11 @@ import io.ktor.response.respond
 import io.ktor.routing.post
 import io.ktor.routing.routing
 import kotlinx.coroutines.withContext
+import nl.martijndwars.webpush.Notification
+import nl.martijndwars.webpush.PushService
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ktugrades.common.SubscriptionPayload
+import java.lang.RuntimeException
 import java.security.Security
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -68,10 +71,51 @@ fun Application.module(testing: Boolean = false) {
             } ?:
             call.respond(HttpStatusCode.BadRequest, ErrorMessage("Authentication failed."))
         }
+        post("/grades") {
+            @Suppress("EXPERIMENTAL_API_USAGE")
+            val client = CoroutineClient(
+                client = HttpClient(CIO) {
+                    install(JsonFeature) { serializer = GsonSerializer() }
+                    install(HttpCookies) { storage = AcceptAllCookiesStorage() }
+                }
+            )
+            val credentials = call.receive<Credentials>()
+            val mod = withContext(client) {
+                dependencies.run {
+                    loginHandler.getAuthCookie(credentials.username, credentials.password) ?: throw RuntimeException("Unable to get the cookie for the student.")
+                    loginHandler.setEnglishLanguageForClient()
+                    loginHandler.getInfo().let {
+                        it.studentSemesters.sortedByDescending { it.year }.take(2).map {
+                            dataHandler.getGrades(planYear = it.year, studId = it.id)
+                        }.flatten().sortedWith(compareBy ({ -it.semesterNumber.toInt() }, {-it.week.split("-").map {it.toInt()}.average()})).toList()
+                    }
+                }
+            }
+            call.respond(HttpStatusCode.BadRequest, ErrorMessage("Authentication failed."))
+
+        }
         post ("/subscription") {
             val payload = call.receive<SubscriptionPayload>()
             dependencies.mySqlProvider.insertUserSubscription(payload)
             call.respond(HttpStatusCode.OK)
+        }
+        post("/broadcast") {
+            val vapidKeyPair = getVapidKeyPair() ?: throw RuntimeException("Could not get VAPID key pair.")
+            val pushService = PushService().apply {
+                publicKey = vapidKeyPair.public
+                privateKey = vapidKeyPair.private
+            }
+            val subscriptions = dependencies.mySqlProvider.getUserSubscriptions()
+            subscriptions.forEach {
+                val res = pushService.send(
+                    Notification(
+                        it.endpoint,
+                        it.key,
+                        it.auth,
+                        "hello its the masrshian space jam is the artist"
+                    )
+                )
+            }
         }
     }
 }

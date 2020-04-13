@@ -5,17 +5,17 @@ package org.ktugrades.backend.models
  */
 
 class MarkModel(
-        val name: String,
-        val id: String,
-        val semester: String,
-        val module_code: String,
-        val module_name: String,
-        val semester_number: String,
-        val credits: String,
-        val language: String,
-        val professor: String,
-        val typeId: String,
-        val type: String?,
-        val week: String,
-        val mark: List<String>
+    val name: String,
+    val id: String,
+    val semester: String,
+    val moduleCode: String,
+    val moduleName: String,
+    val semesterNumber: String,
+    val credits: String,
+    val language: String,
+    val professor: String,
+    val typeId: String,
+    val type: String?,
+    val week: String,
+    val mark: List<String>
 )

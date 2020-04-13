@@ -7,22 +7,22 @@ import org.jsoup.nodes.Element
  */
 
 class ModuleModel(
-        val semester: String,
-        val semester_number: String,
-        val module_code: String,
-        val module_name: String,
-        val credits: String,
-        val language: String,
-        val misc: String,
-        val p1: String?,
-        val p2: String?,
-        val p3: String?
+    val semester: String,
+    val semesterNumber: String,
+    val moduleCode: String,
+    val moduleName: String,
+    val credits: String,
+    val language: String,
+    val misc: String,
+    val p1: String?,
+    val p2: String?,
+    val p3: String?
 ) {
     constructor(element: Element): this(
             semester = element.getSemester(),
-            semester_number = element.getSemesterNumber(),
-            module_code = element.getModuleCode(),
-            module_name = element.getModuleName(),
+            semesterNumber = element.getSemesterNumber(),
+            moduleCode = element.getModuleCode(),
+            moduleName = element.getModuleName(),
             credits = element.getCredits(),
             language = element.getLanguage(),
             misc = element.getMisc(),
