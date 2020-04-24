@@ -55,4 +55,6 @@ inline fun jsObject(init: dynamic.() -> Unit): dynamic {
 
 val applicationJsonHeaders = jsObject { this["Content-type"] = "application/json" }
 
-fun isCredentialsExisting() = localStorage["username"]?.length ?: 0 > 0 && localStorage["password"]?.length ?: 0 > 0
+fun isCredentialsExisting() = localStorage["username"]?.length ?: 0 > 0
+
+fun getUsername(): ByteArray? = localStorage["username"]?.let { JSON.parse(it) }

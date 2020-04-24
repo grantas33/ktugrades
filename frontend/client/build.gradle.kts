@@ -1,5 +1,7 @@
 repositories {
     maven("https://kotlin.bintray.com/kotlin-js-wrappers/")
+    mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -9,9 +11,10 @@ dependencies {
 
     implementation("org.jetbrains:kotlin-react:16.13.0-pre.93-kotlin-1.3.70")
     implementation("org.jetbrains:kotlin-react-dom:16.13.0-pre.93-kotlin-1.3.70")
-    implementation(npm("react", "16.13.0"))
-    implementation(npm("react-dom", "16.13.0"))
-    implementation(npm("urlb64touint8array"))
+    implementation("com.soywiz.korlibs.klock:klock-js:1.9.1")
+
+    implementation(npm("react", "16.13.1"))
+    implementation(npm("react-dom", "16.13.1"))
     implementation(project(":common"))
 }
 

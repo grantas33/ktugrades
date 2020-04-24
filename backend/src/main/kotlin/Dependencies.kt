@@ -4,25 +4,32 @@ import com.github.jasync.sql.db.asSuspending
 import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder
 import org.ktugrades.backend.handlers.DataHandler
 import org.ktugrades.backend.handlers.LoginHandler
-import org.ktugrades.backend.services.EncryptionService
-import org.ktugrades.backend.services.MySqlProvider
 import io.ktor.application.ApplicationEnvironment
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.features.cookies.AcceptAllCookiesStorage
-import io.ktor.client.features.cookies.HttpCookies
-import io.ktor.client.features.json.GsonSerializer
-import io.ktor.client.features.json.JsonFeature
+import org.ktugrades.backend.services.*
 
 @Suppress("unused", "EXPERIMENTAL_API_USAGE") // Referenced in application.conf
 class Dependencies(private val appEnvironment: ApplicationEnvironment) {
 
     val loginHandler by lazy { LoginHandler() }
-    val dataHandler by lazy { DataHandler() }
+    private val dataHandler by lazy { DataHandler() }
+    val markService by lazy {
+        MarkService(dataHandler = dataHandler, mySqlProvider = mySqlProvider)
+    }
+
+    val notificationService by lazy {
+        NotificationService(mySqlProvider = mySqlProvider)
+    }
 
     val encryptionService by lazy {
         EncryptionService(
             key = appEnvironment.config.config("encryption").property("key").getString()
+        )
+    }
+
+    val credentialProvider by lazy {
+        CredentialProvider(
+            userProvider = { mySqlProvider.getUser(it) },
+            encryptionService = encryptionService
         )
     }
 

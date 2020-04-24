@@ -44,11 +44,11 @@ tasks.register("refreshDatabaseTables") {
             username binary(16) not null,
             password binary(16) not null,
             constraint User_pk primary key (username)
-        );
+        ) ROW_FORMAT=DYNAMIC character set utf8mb4;
 
         create table UserSubscriptions
         (
-            id int auto_increment,
+            id binary(16) not null,
             userId binary(16) not null,
             endpoint varchar(255) not null,
             publicKey varchar(255) not null,
@@ -56,44 +56,45 @@ tasks.register("refreshDatabaseTables") {
             constraint UserSubscriptions_pk primary key (id),
             constraint UserSubscriptions_User_username_fk foreign key (userId) references User (username) on delete cascade,
             unique key UserSubscriptions_endpoint_publicKey_auth_uindex (endpoint, publicKey, auth)
-        );
+        ) ROW_FORMAT=DYNAMIC character set utf8mb4;
 
         create table Module
         (
         	code varchar(255) not null,
-        	semesterNumber varchar(255) not null,
+        	semesterCode varchar(255) not null,
         	title varchar(255) null,
         	professor varchar(255) null,
         	constraint Module_pk
-        		primary key (code, semesterNumber)
-        );
+        		primary key (code, semesterCode)
+        ) ROW_FORMAT=DYNAMIC character set utf8mb4;
         
         create table MarkInformation
         (
-        	id int auto_increment,
+        	id binary(16) not null,
         	moduleCode varchar(255) not null,
-        	semesterNumber varchar(255) not null,
+        	semesterCode varchar(255) not null,
             userId binary(16) not null,
         	typeId varchar(255) null,
         	week varchar(255) not null,
+            date datetime not null,
         	constraint MarkInformation_pk
         		primary key (id),
         	constraint MarkInformation_Module_code_semesterNumber_fk
-        		foreign key (moduleCode, semesterNumber) references Module (code, semesterNumber)
+        		foreign key (moduleCode, semesterCode) references Module (code, semesterCode),
             constraint MarkInformation_User_username_fk
-                foreign key (userId) references User (username) on delete cascade,
-        );
+                foreign key (userId) references User (username) on delete cascade
+        ) ROW_FORMAT=DYNAMIC character set utf8mb4;
         
         create table Mark
         (
-        	id int auto_increment,
-        	markInformationId int not null,
+        	id binary(16) not null,
+        	markInformationId binary(16) not null,
         	mark varchar(255) not null,
         	constraint Mark_pk
         		primary key (id),
         	constraint Mark_MarkInformation_id_fk
         		foreign key (markInformationId) references MarkInformation (id) on delete cascade
-        );
+        ) ROW_FORMAT=DYNAMIC character set utf8mb4
 
     """.trimIndent()
 

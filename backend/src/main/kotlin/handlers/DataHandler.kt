@@ -10,10 +10,55 @@ import io.ktor.http.Parameters
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.ktugrades.backend.getClient
+import org.ktugrades.backend.models.LoginModel
 import org.ktugrades.backend.models.MarkModel
 import org.ktugrades.backend.models.ModuleModel
+import org.ktugrades.backend.models.YearModel
 
 class DataHandler {
+
+    suspend fun setEnglishLanguageForClient(): Unit {
+        getClient().get<HttpResponse> {
+            url("https://uais.cr.ktu.lt/ktuis/vs.pirmas?p_lang=ENG")
+        }
+    }
+
+    suspend fun getInfo(): LoginModel {
+        val call = getClient().get<HttpResponse> {
+            url("https://uais.cr.ktu.lt/ktuis/vs.ind_planas")
+        }
+
+        val parse =  Jsoup.parse(call.readText())
+        val nameItemText = parse.select("#ais_lang_link_lt").parents().first().text()
+        val studentId = nameItemText.split(' ')[0].trim()
+        val studentName = nameItemText.split(' ')[1].trim()
+        val studyYears = parse.select(".ind-lst.unstyled > li > a")
+        val yearRegex = "plano_metai=([0-9]+)".toRegex()
+        val idRegex = "p_stud_id=([0-9]+)".toRegex()
+        val studyList = studyYears.map { yearHtml ->
+            yearHtml.attr("href").let { link ->
+                YearModel(
+                    id = idRegex.find(link)!!.groups[1]!!.value,
+                    year = yearRegex.find(link)!!.groups[1]!!.value
+                )
+            }
+        }.toMutableList()
+
+        val calCall = getClient().get<HttpResponse> {
+            url("https://uais.cr.ktu.lt/ktuis/TV_STUD.stud_kal_w0")
+        }
+
+        val calParse = Jsoup.parse(calCall.readText())
+        val currentWeekElement = calParse.select("#kal_div_id").select("option[selected]")[1]
+        val weekRegex = "(?:selected\\>)([0-9]*)".toRegex()
+        val currentWeek = weekRegex.find(currentWeekElement.toString())!!.groupValues[1]
+        return LoginModel(
+            studentName =studentName,
+            studentId = studentId,
+            currentWeek = currentWeek,
+            studentSemesters = studyList
+        )
+    }
 
     suspend fun getGrades(planYear: String, studId: String): List<MarkModel> =
         getModules(planYear, studId).map {
@@ -143,5 +188,4 @@ class DataHandler {
             }
         }
     }
-
 }

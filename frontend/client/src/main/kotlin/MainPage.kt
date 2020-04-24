@@ -2,22 +2,21 @@ import org.ktugrades.common.SubscriptionPayload
 import kotlinx.coroutines.*
 import kotlinx.html.js.onClickFunction
 import org.khronos.webgl.Uint8Array
-import org.w3c.dom.get
+import org.ktugrades.common.EncryptedUsername
+import org.ktugrades.common.ErrorMessage
 import org.w3c.fetch.RequestInit
 import org.w3c.fetch.Response
 import react.*
-import react.dom.h1
+import react.dom.div
 import styled.styledButton
-import kotlin.browser.localStorage
 import kotlin.browser.window
-
-val toUint8Array = kotlinext.js.require("urlb64touint8array") as (base64String: String) -> IntArray
 
 interface MainPageProps: RProps, LocalStorageProps {
     var pushManager: PushManager
 }
 interface MainPageState: RState {
     var pushManagerState: PushManagerState
+    var errorMessage: String
 }
 
 class MainPage: RComponent<MainPageProps, MainPageState>() {
@@ -29,6 +28,24 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
             props.pushManager.getSubscription().await().let {
                 setState {
                     pushManagerState = if (it != null) PushManagerState.Subscribed else PushManagerState.NotSubscribed
+                }
+            }
+
+            window.fetch("${SERVER_URL}/grades", RequestInit(
+                method = "POST",
+                headers = applicationJsonHeaders,
+                body = JSON.stringify(EncryptedUsername(username = getUsername()!!))
+            )).await().let {
+                if (it.ok) {
+
+                    val json = it.json().await()
+                    console.log(json)
+                } else {
+                    val error = it.json().await().unsafeCast<ErrorMessage>()
+                    setState {
+                        errorMessage = error.message
+                    }
+                    console.log(error.message)
                 }
             }
         }
@@ -52,7 +69,7 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
     private suspend fun sendSubscriptionToServer(subscription: PushSubscription): Response {
         if (!isCredentialsExisting()) props.notifyLocalStorageUpdated()
         val payload = SubscriptionPayload(
-                username = JSON.parse(localStorage["username"]!!),
+                username = getUsername()!!,
                 endpoint = subscription.endpoint,
                 key = subscription.getKey("p256dh")
                     .let { window.btoa(js("String").fromCharCode.apply(null, Uint8Array(it)) as String) },
@@ -70,14 +87,15 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
     override fun RBuilder.render() {
         flexBox {
             when (state.pushManagerState) {
-                PushManagerState.Subscribed -> h1 {
-                    +"Grades"
-                }
-                PushManagerState.NotSubscribed -> styledButton {
-                    attrs {
-                        onClickFunction = { subscribeUser() }
+                PushManagerState.Subscribed -> grades {  }
+                PushManagerState.NotSubscribed -> div {
+                    grades { }
+                    styledButton {
+                        attrs {
+                            onClickFunction = { subscribeUser() }
+                        }
+                        +"Subscribe to push notifications to receive a notification on this device upon receiving a mark."
                     }
-                    +"Subscribe to push notifications to receive a notification on this device upon receiving a mark."
                 }
                 PushManagerState.Loading -> loadingComponent()
             }

@@ -16,6 +16,7 @@ services:
       # Where our data will be persisted
     volumes:
       - my-db:/var/lib/mysql
+      - ./mysql:/etc/mysql/conf.d
 # Names our volume
 volumes:
   my-db:

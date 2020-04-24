@@ -4,23 +4,20 @@ data class Credentials(val username: String, val password: String)
 
 data class ErrorMessage(val message: String)
 
-data class AuthenticationResponse(val username: ByteArray, val password: ByteArray) {
+data class EncryptedUsername(val username: ByteArray) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
 
-        other as AuthenticationResponse
+        other as EncryptedUsername
 
         if (!username.contentEquals(other.username)) return false
-        if (!password.contentEquals(other.password)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = username.contentHashCode()
-        result = 31 * result + password.contentHashCode()
-        return result
+        return username.contentHashCode()
     }
 }
 

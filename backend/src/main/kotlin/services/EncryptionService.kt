@@ -15,6 +15,6 @@ class EncryptionService(private val key: String) {
 
     fun decrypt(bytes: ByteArray): String {
         cipher.init(Cipher.DECRYPT_MODE, aesKey)
-        return cipher.doFinal(bytes).toString()
+        return cipher.doFinal(bytes).map { it.toChar() }.joinToString("")
     }
 }

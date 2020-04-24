@@ -1,4 +1,4 @@
-import org.ktugrades.common.AuthenticationResponse
+import org.ktugrades.common.EncryptedUsername
 import org.ktugrades.common.Credentials
 import org.ktugrades.common.ErrorMessage
 import kotlinx.coroutines.*
@@ -36,9 +36,8 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
             body = JSON.stringify(Credentials(username = state.username, password = state.password))
         )).await().let {
             if (it.ok) {
-                val encrypted = it.json().await().unsafeCast<AuthenticationResponse>()
+                val encrypted = it.json().await().unsafeCast<EncryptedUsername>()
                 localStorage.setItem("username", encrypted.username.contentToString())
-                localStorage.setItem("password", encrypted.password.contentToString())
                 props.notifyLocalStorageUpdated()
             } else {
                 val error = it.json().await().unsafeCast<ErrorMessage>()

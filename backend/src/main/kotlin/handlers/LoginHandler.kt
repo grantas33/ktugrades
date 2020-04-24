@@ -1,8 +1,6 @@
 package org.ktugrades.backend.handlers
 
 import org.ktugrades.backend.*
-import org.ktugrades.backend.models.LoginModel
-import org.ktugrades.backend.models.YearModel
 import io.ktor.client.features.cookies.cookies
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
@@ -15,13 +13,13 @@ import org.jsoup.Jsoup
 
 class LoginHandler {
 
-    suspend fun getAuthCookie(username: String, password: String): String? {
+    suspend fun getAuthCookie(username: String, password: String): String {
         return try {
             val postLogin = postLogin(username, password, getAuthState())
             getStudCookie(postLogin.samlResponse, postLogin.relayState)
         } catch (e: Exception) {
             null
-        }
+        } ?: throw IllegalArgumentException("Unable to get the cookie for the student.")
     }
 
     data class PostLoginResponse(val samlResponse: String, val relayState: String)
@@ -80,48 +78,5 @@ class LoginHandler {
                 }
         }
         return null
-    }
-
-    public suspend fun setEnglishLanguageForClient(): Unit {
-        getClient().get<HttpResponse> {
-            url("https://uais.cr.ktu.lt/ktuis/vs.pirmas?p_lang=ENG")
-        }
-    }
-
-    public suspend fun getInfo(): LoginModel {
-        val call = getClient().get<HttpResponse> {
-            url("https://uais.cr.ktu.lt/ktuis/vs.ind_planas")
-        }
-
-        val parse =  Jsoup.parse(call.readText())
-        val nameItemText = parse.select("#ais_lang_link_lt").parents().first().text()
-        val studentId = nameItemText.split(' ')[0].trim()
-        val studentName = nameItemText.split(' ')[1].trim()
-        val studyYears = parse.select(".ind-lst.unstyled > li > a")
-        val yearRegex = "plano_metai=([0-9]+)".toRegex()
-        val idRegex = "p_stud_id=([0-9]+)".toRegex()
-        val studyList = studyYears.map { yearHtml ->
-            yearHtml.attr("href").let { link ->
-                YearModel(
-                    id = idRegex.find(link)!!.groups[1]!!.value,
-                    year = yearRegex.find(link)!!.groups[1]!!.value
-                )
-            }
-        }.toMutableList()
-
-        val calCall = getClient().get<HttpResponse> {
-            url("https://uais.cr.ktu.lt/ktuis/TV_STUD.stud_kal_w0")
-        }
-
-        val calParse = Jsoup.parse(calCall.readText())
-        val currentWeekElement = calParse.select("#kal_div_id").select("option[selected]")[1]
-        val weekRegex = "(?:selected\\>)([0-9]*)".toRegex()
-        val currentWeek = weekRegex.find(currentWeekElement.toString())!!.groupValues[1]
-        return LoginModel(
-                studentName =studentName,
-                studentId = studentId,
-                currentWeek = currentWeek,
-                studentSemesters = studyList
-        )
     }
 }
