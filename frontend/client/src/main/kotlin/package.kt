@@ -1,8 +1,13 @@
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
+import org.ktugrades.common.ErrorMessage
+import org.ktugrades.common.MarkInfoResponse
 import org.w3c.dom.get
 import org.w3c.workers.ServiceWorkerRegistration
 import kotlin.browser.localStorage
+import kotlin.js.Date
 import kotlin.js.Promise
 
 val PUSH_API_PUBLIC_KEY = "04:b4:64:c9:1a:7e:0e:b2:86:83:78:a0:97:92:bc:cb:84:72:20:b8:82:53:7c:bc:16:13:ab:ce:5d:91:c3:d6:7e:19:2c:c5:28:3b:73:69:1e:f2:a8:3f:7f:b1:9d:d8:85:e9:80:93:df:85:b9:c6:d6:a7:27:94:c0:2b:7d:bb:c0"
@@ -10,6 +15,8 @@ val PUSH_API_PUBLIC_KEY = "04:b4:64:c9:1a:7e:0e:b2:86:83:78:a0:97:92:bc:cb:84:72
     .let {
         Uint8Array(it.map { it.toInt(16).toByte() }.toTypedArray())
     }
+
+val json = Json(configuration = JsonConfiguration.Stable)
 
 const val SERVER_URL = "http://127.0.0.1:5000"
 
@@ -58,3 +65,21 @@ val applicationJsonHeaders = jsObject { this["Content-type"] = "application/json
 fun isCredentialsExisting() = localStorage["username"]?.length ?: 0 > 0
 
 fun getUsername(): ByteArray? = localStorage["username"]?.let { JSON.parse(it) }
+
+data class MarkInfo(
+    val id: String,
+    val moduleCode: String,
+    val semesterCode: String,
+    val title: String,
+    val professor: String,
+    val typeId: String?,
+    val week: String,
+    val date: Date,
+    val marks: List<String>
+)
+
+sealed class MarkState {
+    data class Success(val marks: List<MarkInfoResponse>): MarkState()
+    data class Error(val error: ErrorMessage): MarkState()
+    object Loading: MarkState()
+}

@@ -1,9 +1,14 @@
 package org.ktugrades.common
 
+import kotlinx.serialization.*
+
+@Serializable
 data class Credentials(val username: String, val password: String)
 
+@Serializable
 data class ErrorMessage(val message: String)
 
+@Serializable
 data class EncryptedUsername(val username: ByteArray) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -21,6 +26,7 @@ data class EncryptedUsername(val username: ByteArray) {
     }
 }
 
+@Serializable
 data class SubscriptionPayload(val username: ByteArray, val endpoint: String, val key: String, val auth: String) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -44,3 +50,23 @@ data class SubscriptionPayload(val username: ByteArray, val endpoint: String, va
         return result
     }
 }
+
+@Serializable(with = CommonDateTimeSerializer::class)
+expect class CommonDateTime(millis: Long) {
+    fun getYear(): Int
+}
+
+@Serializer(forClass = CommonDateTime::class)
+object CommonDateTimeSerializer
+
+@Serializable
+data class MarkInfoResponse(
+    val moduleCode: String,
+    val semesterCode: String,
+    val title: String,
+    val professor: String,
+    val typeId: String?,
+    val week: String,
+    val date: CommonDateTime,
+    val marks: List<String>
+)

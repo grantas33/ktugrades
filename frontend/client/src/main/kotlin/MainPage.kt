@@ -30,24 +30,6 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
                     pushManagerState = if (it != null) PushManagerState.Subscribed else PushManagerState.NotSubscribed
                 }
             }
-
-            window.fetch("${SERVER_URL}/grades", RequestInit(
-                method = "POST",
-                headers = applicationJsonHeaders,
-                body = JSON.stringify(EncryptedUsername(username = getUsername()!!))
-            )).await().let {
-                if (it.ok) {
-
-                    val json = it.json().await()
-                    console.log(json)
-                } else {
-                    val error = it.json().await().unsafeCast<ErrorMessage>()
-                    setState {
-                        errorMessage = error.message
-                    }
-                    console.log(error.message)
-                }
-            }
         }
     }
 
@@ -80,16 +62,15 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
         return window.fetch("${SERVER_URL}/subscription", RequestInit(
             method = "POST",
             headers = applicationJsonHeaders,
-            body = JSON.stringify(payload)
+            body = json.stringify(SubscriptionPayload.serializer(), payload)
         )).await()
     }
 
     override fun RBuilder.render() {
         flexBox {
-            when (state.pushManagerState) {
-                PushManagerState.Subscribed -> grades {  }
-                PushManagerState.NotSubscribed -> div {
-                    grades { }
+            grades {  }
+            if (state.pushManagerState == PushManagerState.NotSubscribed) {
+                 div {
                     styledButton {
                         attrs {
                             onClickFunction = { subscribeUser() }
@@ -97,7 +78,6 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
                         +"Subscribe to push notifications to receive a notification on this device upon receiving a mark."
                     }
                 }
-                PushManagerState.Loading -> loadingComponent()
             }
         }
     }

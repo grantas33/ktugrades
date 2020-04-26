@@ -12,6 +12,8 @@ import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 import org.joda.time.DateTime
+import org.ktugrades.common.CommonDateTime
+import org.ktugrades.common.MarkInfoResponse
 import java.io.InputStreamReader
 import java.nio.ByteBuffer
 import java.security.KeyPair
@@ -89,6 +91,17 @@ data class MarkInfo(
     val week: String,
     val date: DateTime,
     val marks: List<String>
+)
+
+fun MarkInfo.toResponse(): MarkInfoResponse = MarkInfoResponse(
+    moduleCode = moduleCode,
+    semesterCode = semesterCode,
+    title = title,
+    professor = professor,
+    typeId = typeId,
+    week = week,
+    date = CommonDateTime(this.date.millis),
+    marks = marks
 )
 
 fun List<MarkInfo>.sort() = this

@@ -6,13 +6,15 @@ import io.ktor.application.install
 import io.ktor.features.CORS
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
-import io.ktor.gson.gson
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.post
 import io.ktor.routing.routing
+import io.ktor.serialization.json
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ktugrades.common.*
 import org.slf4j.LoggerFactory
@@ -26,6 +28,7 @@ fun Application.module(testing: Boolean = false) {
     Security.addProvider(BouncyCastleProvider())
     val dependencies = Dependencies(environment)
     val logger = LoggerFactory.getLogger("app")
+    val jsonSerializer = Json(configuration = JsonConfiguration.Stable)
 
     install(CORS) {
         method(HttpMethod.Options)
@@ -35,10 +38,7 @@ fun Application.module(testing: Boolean = false) {
     }
 
     install(ContentNegotiation) {
-        gson {
-            setPrettyPrinting()
-            serializeNulls()
-        }
+        json(json = jsonSerializer)
     }
 
     install(StatusPages) {
@@ -75,7 +75,7 @@ fun Application.module(testing: Boolean = false) {
                         mySqlProvider.updateMarks(it.markInfoToUpdate + it.markInfoToUpdateAndNotify, encrypted.username)
                         call.respond(
                             status = HttpStatusCode.OK,
-                            message = it.latestMarks
+                            message = it.latestMarks.map { it.toResponse() }
                         )
                     }
                 }

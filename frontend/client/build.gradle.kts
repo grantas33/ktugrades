@@ -11,7 +11,6 @@ dependencies {
 
     implementation("org.jetbrains:kotlin-react:16.13.0-pre.93-kotlin-1.3.70")
     implementation("org.jetbrains:kotlin-react-dom:16.13.0-pre.93-kotlin-1.3.70")
-    implementation("com.soywiz.korlibs.klock:klock-js:1.9.1")
 
     implementation(npm("react", "16.13.1"))
     implementation(npm("react-dom", "16.13.1"))

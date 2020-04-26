@@ -60,7 +60,7 @@ class MarkService(private val dataHandler: DataHandler, private val mySqlProvide
             }
             .distinct()
 
-        val updatedMarks = (markInfoToUpdateAndNotify + markInfoToUpdate)
+        val updatedMarks = (markInfoToAddAndNotify + markInfoToUpdateAndNotify + markInfoToUpdate)
         val latestMarks = (databaseMarks.filter { dbMark -> updatedMarks.any { dbMark.id == it.id }.not() } + updatedMarks).sort().take(50)
 
         return MarkAggregationResult(

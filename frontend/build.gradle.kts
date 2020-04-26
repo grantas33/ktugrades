@@ -1,5 +1,6 @@
 plugins {
     id("org.jetbrains.kotlin.js") apply false
+    kotlin("plugin.serialization")
 }
 
 subprojects {
@@ -17,6 +18,7 @@ subprojects {
 
     dependencies {
         implementation(kotlin("stdlib-js"))
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
     }
 
     tasks.register<Copy>("copyDistribution") {

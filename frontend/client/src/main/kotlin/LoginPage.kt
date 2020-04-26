@@ -33,14 +33,14 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
         window.fetch("${SERVER_URL}/authenticate", RequestInit(
             method = "POST",
             headers = applicationJsonHeaders,
-            body = JSON.stringify(Credentials(username = state.username, password = state.password))
+            body = json.stringify(Credentials.serializer(), Credentials(username = state.username, password = state.password))
         )).await().let {
             if (it.ok) {
-                val encrypted = it.json().await().unsafeCast<EncryptedUsername>()
+                val encrypted = json.parse(EncryptedUsername.serializer(), it.text().await())
                 localStorage.setItem("username", encrypted.username.contentToString())
                 props.notifyLocalStorageUpdated()
             } else {
-                val error = it.json().await().unsafeCast<ErrorMessage>()
+                val error = json.parse(ErrorMessage.serializer(), it.text().await())
                 setState {
                     errorMessage = error.message
                 }
