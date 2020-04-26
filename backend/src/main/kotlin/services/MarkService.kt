@@ -3,9 +3,9 @@ package org.ktugrades.backend.services
 import org.joda.time.DateTime
 import org.ktugrades.backend.MarkAggregationResult
 import org.ktugrades.backend.MarkInfo
-import org.ktugrades.backend.Module
 import org.ktugrades.backend.handlers.DataHandler
 import org.ktugrades.backend.sort
+import org.ktugrades.common.Module
 import java.lang.RuntimeException
 import java.util.*
 

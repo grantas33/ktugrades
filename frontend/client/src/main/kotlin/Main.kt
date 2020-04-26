@@ -21,6 +21,14 @@ fun main() {
             width = LinearDimension("100%")
             height = LinearDimension("100%")
         }
+        th {
+            fontSize = LinearDimension("2.5rem")
+            paddingLeft = LinearDimension("2px")
+            paddingRight = LinearDimension("2px")
+        }
+        table {
+            borderSpacing = LinearDimension("15px")
+        }
     }
 
     StyledComponents.injectGlobal(styles.toString())

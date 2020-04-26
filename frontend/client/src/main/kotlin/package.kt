@@ -66,17 +66,7 @@ fun isCredentialsExisting() = localStorage["username"]?.length ?: 0 > 0
 
 fun getUsername(): ByteArray? = localStorage["username"]?.let { JSON.parse(it) }
 
-data class MarkInfo(
-    val id: String,
-    val moduleCode: String,
-    val semesterCode: String,
-    val title: String,
-    val professor: String,
-    val typeId: String?,
-    val week: String,
-    val date: Date,
-    val marks: List<String>
-)
+data class MarkType(val typeId: String?, val weeks: String)
 
 sealed class MarkState {
     data class Success(val marks: List<MarkInfoResponse>): MarkState()

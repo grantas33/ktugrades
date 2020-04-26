@@ -8,5 +8,5 @@ actual class CommonDateTime actual constructor(val millis: Long) {
     private val dateObj: Date
         get() = Date(millis)
 
-    actual fun getYear() = dateObj.getFullYear()
+    actual fun getFormatted() = "${dateObj.toLocaleDateString()} ${dateObj.toLocaleTimeString()}"
 }

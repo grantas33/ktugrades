@@ -53,7 +53,7 @@ data class SubscriptionPayload(val username: ByteArray, val endpoint: String, va
 
 @Serializable(with = CommonDateTimeSerializer::class)
 expect class CommonDateTime(millis: Long) {
-    fun getYear(): Int
+    fun getFormatted(): String
 }
 
 @Serializer(forClass = CommonDateTime::class)
@@ -69,4 +69,11 @@ data class MarkInfoResponse(
     val week: String,
     val date: CommonDateTime,
     val marks: List<String>
+)
+
+data class Module (
+    val code: String,
+    val semesterCode: String,
+    val title: String,
+    val professor: String
 )

@@ -2,13 +2,16 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.list
-import org.ktugrades.common.CommonDateTime
-import org.ktugrades.common.EncryptedUsername
-import org.ktugrades.common.ErrorMessage
-import org.ktugrades.common.MarkInfoResponse
+import org.ktugrades.common.*
 import org.w3c.fetch.RequestInit
 import react.*
 import react.dom.h1
+import react.dom.tbody
+import react.dom.thead
+import styled.styledTable
+import styled.styledTd
+import styled.styledTh
+import styled.styledTr
 import kotlin.browser.window
 
 interface GradesProps: RProps, LocalStorageProps
@@ -44,15 +47,33 @@ class Grades: RComponent<GradesProps, GradesState>() {
     }
 
     override fun RBuilder.render() {
-        when (state.markState) {
-            is MarkState.Success ->  h1 {
-                +"Grades"
+        flexBox {
+            when (state.markState) {
+                is MarkState.Success -> styledTable {
+                    thead {
+                        styledTr {
+                            styledTh { +"Mark" }
+                            styledTh { +"Module" }
+                            styledTh { +"Type" }
+                            styledTh { +"Date" }
+                        }
+                    }
+                    tbody {
+                        (state.markState as MarkState.Success).marks.map {
+                            styledTr {
+                                styledTd { markComponent(it.marks) }
+                                styledTd { moduleComponent(Module(it.moduleCode, it.semesterCode, it.title, it.professor)) }
+                                styledTd { typeComponent(MarkType(it.typeId, it.week)) }
+                                styledTd { +it.date.getFormatted() }
+                            }
+                        }
+                    }
+                }
+                is MarkState.Error -> h1 {
+                    +(state.markState as MarkState.Error).error.message
+                }
+                is MarkState.Loading -> loadingComponent()
             }
-
-            is MarkState.Error -> h1 {
-                + (state.markState as MarkState.Error).error.message
-            }
-            is MarkState.Loading -> loadingComponent()
         }
     }
 }

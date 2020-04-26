@@ -14,6 +14,7 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 import org.joda.time.DateTime
 import org.ktugrades.common.CommonDateTime
 import org.ktugrades.common.MarkInfoResponse
+import org.ktugrades.common.Module
 import java.io.InputStreamReader
 import java.nio.ByteBuffer
 import java.security.KeyPair
@@ -105,18 +106,11 @@ fun MarkInfo.toResponse(): MarkInfoResponse = MarkInfoResponse(
 )
 
 fun List<MarkInfo>.sort() = this
-    .sortedWith(compareBy<MarkInfo> {it.date}
+    .sortedWith(compareByDescending<MarkInfo> {it.date}
         .thenByDescending {it.semesterCode }
         .thenByDescending {it.week.split("-").map {it.toInt()}.average()}
         .thenBy {it.title}
     )
-
-data class Module (
-    val code: String,
-    val semesterCode: String,
-    val title: String,
-    val professor: String
-)
 
 fun UUID.getBytes(): ByteArray = ByteBuffer.wrap(ByteArray(16)).let {
     it.putLong(this.mostSignificantBits)
