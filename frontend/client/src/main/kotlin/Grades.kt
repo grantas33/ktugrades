@@ -26,10 +26,9 @@ class Grades: RComponent<GradesProps, GradesState>() {
         markState = MarkState.Loading
 
         MainScope().launch {
-            window.fetch("${SERVER_URL}/grades", RequestInit(
-                method = "POST",
-                headers = applicationJsonHeaders,
-                body = json.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = getUsername()!!))
+            window.fetch("${SERVER_URL}/grades?username=${json.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = getUsername()!!))}", RequestInit(
+                method = "GET",
+                headers = applicationJsonHeaders
             )).await().let {
                 if (it.ok) {
                     val marks = json.parse(MarkInfoResponse.serializer().list, it.text().await())

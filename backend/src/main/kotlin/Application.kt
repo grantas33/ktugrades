@@ -8,8 +8,10 @@ import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.Parameters
 import io.ktor.request.receive
 import io.ktor.response.respond
+import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.serialization.json
@@ -63,8 +65,9 @@ fun Application.module(testing: Boolean = false) {
             dependencies.mySqlProvider.upsertUser(username = encryptedUsername, password = encryptedPassword)
             call.respond(HttpStatusCode.OK, EncryptedUsername(username = encryptedUsername))
         }
-        post("/grades") {
-            val encrypted = call.receive<EncryptedUsername>()
+        get("/grades") {
+            val queryParameters: Parameters = call.request.queryParameters
+            val encrypted = jsonSerializer.parse(EncryptedUsername.serializer(), queryParameters["username"]!!)
             val credentials = dependencies.credentialProvider.getCredentials(encrypted.username)
             withCoroutineClient {
                 dependencies.run {
