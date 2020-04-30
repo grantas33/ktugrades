@@ -1,3 +1,7 @@
+plugins {
+    kotlin("plugin.serialization")
+}
+
 repositories {
     maven("https://kotlin.bintray.com/kotlin-js-wrappers/")
     mavenCentral()
@@ -12,6 +16,12 @@ dependencies {
     implementation("org.jetbrains:kotlin-react:16.13.0-pre.93-kotlin-1.3.70")
     implementation("org.jetbrains:kotlin-react-dom:16.13.0-pre.93-kotlin-1.3.70")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+    implementation(npm("text-encoding"))
+    implementation(npm("abort-controller"))
+    implementation("io.ktor:ktor-client-js:1.3.2")
+    implementation("io.ktor:ktor-client-json-js:1.3.2")
+    implementation("io.ktor:ktor-client-serialization-js:1.3.2")
+    implementation(npm("fs"))
 
     implementation(npm("react", "16.13.1"))
     implementation(npm("react-dom", "16.13.1"))

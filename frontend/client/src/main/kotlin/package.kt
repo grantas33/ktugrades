@@ -1,5 +1,3 @@
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
 import org.ktugrades.common.ErrorMessage
@@ -15,8 +13,6 @@ val PUSH_API_PUBLIC_KEY = "04:b4:64:c9:1a:7e:0e:b2:86:83:78:a0:97:92:bc:cb:84:72
     .let {
         Uint8Array(it.map { it.toInt(16).toByte() }.toTypedArray())
     }
-
-val json = Json(configuration = JsonConfiguration.Stable)
 
 const val SERVER_URL = "http://127.0.0.1:5000"
 
@@ -59,8 +55,6 @@ inline fun jsObject(init: dynamic.() -> Unit): dynamic {
     init(o)
     return o
 }
-
-val applicationJsonHeaders = jsObject { this["Content-type"] = "application/json" }
 
 fun isCredentialsExisting() = localStorage["username"]?.length ?: 0 > 0
 

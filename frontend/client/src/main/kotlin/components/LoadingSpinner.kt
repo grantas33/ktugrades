@@ -1,6 +1,8 @@
 @file:JsModule("react-loader-spinner")
 @file:JsNonModule
 
+package components
+
 import react.*
 
 @JsName("default")

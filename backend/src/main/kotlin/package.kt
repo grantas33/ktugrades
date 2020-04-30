@@ -23,7 +23,6 @@ import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 
-
 fun getVapidKeyPair(): KeyPair? {
     val reader = InputStreamReader(object {}.javaClass.getResourceAsStream("/vapid_private.pem"))
     val pemParser = PEMParser(reader)

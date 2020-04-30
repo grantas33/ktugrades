@@ -1,11 +1,13 @@
+import components.flexBox
+import components.grades
+import io.ktor.client.request.post
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import org.ktugrades.common.SubscriptionPayload
 import kotlinx.coroutines.*
 import kotlinx.html.js.onClickFunction
 import org.khronos.webgl.Uint8Array
-import org.ktugrades.common.EncryptedUsername
-import org.ktugrades.common.ErrorMessage
-import org.w3c.fetch.RequestInit
-import org.w3c.fetch.Response
+import org.ktugrades.common.Routes
 import react.*
 import react.dom.div
 import styled.styledButton
@@ -48,7 +50,7 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
         }
     }
 
-    private suspend fun sendSubscriptionToServer(subscription: PushSubscription): Response {
+    private suspend fun sendSubscriptionToServer(subscription: PushSubscription) {
         if (!isCredentialsExisting()) props.notifyLocalStorageUpdated()
         val payload = SubscriptionPayload(
                 username = getUsername()!!,
@@ -59,11 +61,10 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
                     .let { window.btoa(js("String").fromCharCode.apply(null, Uint8Array(it)) as String) }
             )
 
-        return window.fetch("${SERVER_URL}/subscription", RequestInit(
-            method = "POST",
-            headers = applicationJsonHeaders,
-            body = json.stringify(SubscriptionPayload.serializer(), payload)
-        )).await()
+        jsonClient.post<Unit>(SERVER_URL + Routes.Subscription) {
+            contentType(ContentType.Application.Json)
+            body = payload
+        }
     }
 
     override fun RBuilder.render() {

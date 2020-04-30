@@ -1,6 +1,5 @@
 plugins {
     id("org.jetbrains.kotlin.js") apply false
-    kotlin("plugin.serialization")
 }
 
 subprojects {

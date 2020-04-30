@@ -55,7 +55,7 @@ fun Application.module(testing: Boolean = false) {
     }
 
     routing {
-        post("/authenticate") {
+        post(Routes.Authenticate) {
             val credentials = call.receive<Credentials>()
             withCoroutineClient {
                 dependencies.loginHandler.getAuthCookie(credentials.username, credentials.password)
@@ -65,7 +65,7 @@ fun Application.module(testing: Boolean = false) {
             dependencies.mySqlProvider.upsertUser(username = encryptedUsername, password = encryptedPassword)
             call.respond(HttpStatusCode.OK, EncryptedUsername(username = encryptedUsername))
         }
-        get("/grades") {
+        get(Routes.Grades) {
             val queryParameters: Parameters = call.request.queryParameters
             val encrypted = jsonSerializer.parse(EncryptedUsername.serializer(), queryParameters["username"]!!)
             val credentials = dependencies.credentialProvider.getCredentials(encrypted.username)
@@ -84,7 +84,7 @@ fun Application.module(testing: Boolean = false) {
                 }
             }
         }
-        post ("/subscription") {
+        post (Routes.Subscription) {
             val payload = call.receive<SubscriptionPayload>()
             dependencies.mySqlProvider.insertUserSubscription(payload)
             call.respond(HttpStatusCode.OK)

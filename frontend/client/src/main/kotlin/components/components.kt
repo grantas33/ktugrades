@@ -1,3 +1,6 @@
+package components
+
+import MarkType
 import kotlinx.css.*
 import kotlinx.html.BUTTON
 import kotlinx.html.DIV

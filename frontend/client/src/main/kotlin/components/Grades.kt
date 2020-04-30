@@ -1,9 +1,19 @@
+package components
+
+import LocalStorageProps
+import MarkState
+import MarkType
+import SERVER_URL
+import getUsername
+import io.ktor.client.call.receive
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.isSuccess
+import json
+import jsonClient
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
-import kotlinx.serialization.builtins.list
 import org.ktugrades.common.*
-import org.w3c.fetch.RequestInit
 import react.*
 import react.dom.h1
 import react.dom.tbody
@@ -12,7 +22,6 @@ import styled.styledTable
 import styled.styledTd
 import styled.styledTh
 import styled.styledTr
-import kotlin.browser.window
 
 interface GradesProps: RProps, LocalStorageProps
 
@@ -25,20 +34,21 @@ class Grades: RComponent<GradesProps, GradesState>() {
     override fun GradesState.init() {
         markState = MarkState.Loading
 
+        val serializedUsername = json.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = getUsername()!!))
         MainScope().launch {
-            window.fetch("${SERVER_URL}/grades?username=${json.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = getUsername()!!))}", RequestInit(
-                method = "GET",
-                headers = applicationJsonHeaders
-            )).await().let {
-                if (it.ok) {
-                    val marks = json.parse(MarkInfoResponse.serializer().list, it.text().await())
-                    setState {
-                        markState = MarkState.Success(marks = marks)
+            jsonClient.get<HttpResponse>("${SERVER_URL}${Routes.Grades}?username=${serializedUsername}").let {
+                when {
+                    it.status.isSuccess() -> {
+                        val marks = it.receive<List<MarkInfoResponse>>()
+                        setState {
+                            markState = MarkState.Success(marks = marks)
+                        }
                     }
-                } else {
-                    val error = json.parse(ErrorMessage.serializer(), it.text().await())
-                    setState {
-                        markState = MarkState.Error(error = error)
+                    else -> {
+                        val error = it.receive<ErrorMessage>()
+                        setState {
+                            markState = MarkState.Error(error = error)
+                        }
                     }
                 }
             }

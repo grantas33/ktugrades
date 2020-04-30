@@ -11,6 +11,7 @@ import io.ktor.client.statement.readText
 import io.ktor.http.*
 import org.jsoup.Jsoup
 
+// TODO: handle case when password change is required
 class LoginHandler {
 
     suspend fun getAuthCookie(username: String, password: String): String {

@@ -13,6 +13,7 @@ class MarkService(private val dataHandler: DataHandler, private val mySqlProvide
 
     suspend fun getMarks(username: ByteArray): MarkAggregationResult {
         dataHandler.setEnglishLanguageForClient()
+        val currentDate = DateTime.now()
         val realtimeMarks = dataHandler.getInfo().let {
             it.studentSemesters.sortedByDescending { it.year }.take(2).map { yearModel ->
                 dataHandler.getGrades(planYear = yearModel.year, studId = yearModel.id).map {
@@ -24,7 +25,7 @@ class MarkService(private val dataHandler: DataHandler, private val mySqlProvide
                         professor = it.professor,
                         typeId = it.typeId,
                         week = it.week,
-                        date = DateTime.now(),
+                        date = currentDate,
                         marks = it.mark.filter { it.isNotBlank() }
                     )
                 }
@@ -41,7 +42,7 @@ class MarkService(private val dataHandler: DataHandler, private val mySqlProvide
             when {
                 replica == null -> markInfoToAddAndNotify.add(curr)
                 replica.marks.containsAll(curr.marks).not() -> markInfoToUpdateAndNotify.add(
-                    replica.copy(typeId = curr.typeId, date = DateTime.now(), marks = curr.marks)
+                    replica.copy(typeId = curr.typeId, date = currentDate, marks = curr.marks)
                 )
                 curr.marks.containsAll(replica.marks).not()  ->
                     markInfoToUpdate.add(replica.copy(typeId = curr.typeId, marks = curr.marks))

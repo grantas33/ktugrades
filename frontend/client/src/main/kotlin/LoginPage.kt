@@ -1,18 +1,24 @@
+import components.appButton
+import io.ktor.client.call.receive
+import io.ktor.client.request.post
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import org.ktugrades.common.EncryptedUsername
 import org.ktugrades.common.Credentials
-import org.ktugrades.common.ErrorMessage
 import kotlinx.coroutines.*
 import kotlinx.css.*
 import kotlinx.html.ButtonType
 import kotlinx.html.InputType
 import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onClickFunction
+import org.ktugrades.common.ErrorMessage
+import org.ktugrades.common.Routes
 import org.w3c.dom.HTMLInputElement
-import org.w3c.fetch.RequestInit
 import react.*
 import styled.*
 import kotlin.browser.localStorage
-import kotlin.browser.window
 
 interface LoginPageProps: RProps, LocalStorageProps
 
@@ -30,19 +36,21 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
     }
 
     private fun authenticateUser() = GlobalScope.launch {
-        window.fetch("${SERVER_URL}/authenticate", RequestInit(
-            method = "POST",
-            headers = applicationJsonHeaders,
-            body = json.stringify(Credentials.serializer(), Credentials(username = state.username, password = state.password))
-        )).await().let {
-            if (it.ok) {
-                val encrypted = json.parse(EncryptedUsername.serializer(), it.text().await())
-                localStorage.setItem("username", encrypted.username.contentToString())
-                props.notifyLocalStorageUpdated()
-            } else {
-                val error = json.parse(ErrorMessage.serializer(), it.text().await())
-                setState {
-                    errorMessage = error.message
+        jsonClient.post<HttpResponse>(SERVER_URL + Routes.Authenticate) {
+            contentType(ContentType.Application.Json)
+            body = Credentials(username = state.username, password = state.password)
+        }.let {
+            when {
+                it.status.isSuccess() -> {
+                    val encrypted = it.receive<EncryptedUsername>()
+                    localStorage.setItem("username", encrypted.username.contentToString())
+                    props.notifyLocalStorageUpdated()
+                }
+                else -> {
+                    val error = it.receive<ErrorMessage>()
+                    setState {
+                        errorMessage = error.message
+                    }
                 }
             }
         }
