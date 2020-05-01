@@ -5,6 +5,7 @@ import kotlinx.css.*
 import kotlinx.html.BUTTON
 import kotlinx.html.DIV
 import org.ktugrades.common.Module
+import org.ktugrades.common.toMarkString
 import react.RBuilder
 import react.ReactElement
 import react.dom.RDOMBuilder
@@ -48,7 +49,7 @@ fun RBuilder.loadingComponent() = LoadingSpinner {
 }
 
 fun RBuilder.markComponent(marks: List<String>): ReactElement {
-    val markString = marks.joinToString(", ") { it.removePrefix("0") }
+    val markString = marks.toMarkString()
     return styledDiv {
         css {
             fontSize = LinearDimension("4rem")

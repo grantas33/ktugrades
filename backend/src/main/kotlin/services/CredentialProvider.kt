@@ -15,4 +15,9 @@ class CredentialProvider(
             )
         }
     }
+
+    fun getCredentials(encryptedUsername: ByteArray, encryptedPassword: ByteArray) = Credentials(
+        username = encryptionService.decrypt(encryptedUsername),
+        password = encryptionService.decrypt(encryptedPassword)
+    )
 }

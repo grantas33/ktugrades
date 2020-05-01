@@ -17,6 +17,8 @@ subprojects {
 
     dependencies {
         implementation(kotlin("stdlib-js"))
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+        implementation(project(":common"))
     }
 
     tasks.register<Copy>("copyDistribution") {

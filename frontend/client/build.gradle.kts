@@ -15,7 +15,6 @@ dependencies {
 
     implementation("org.jetbrains:kotlin-react:16.13.0-pre.93-kotlin-1.3.70")
     implementation("org.jetbrains:kotlin-react-dom:16.13.0-pre.93-kotlin-1.3.70")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
     implementation(npm("text-encoding"))
     implementation(npm("abort-controller"))
     implementation("io.ktor:ktor-client-js:1.3.2")
@@ -26,7 +25,11 @@ dependencies {
     implementation(npm("react", "16.13.1"))
     implementation(npm("react-dom", "16.13.1"))
     implementation(npm("react-loader-spinner", "3.1.14"))
-    implementation(project(":common"))
 }
 
-kotlin.target.browser { }
+kotlin.target.browser {
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    dceTask {
+        keep("ktor-ktor-io.\$\$importsForInline\$\$.ktor-ktor-io.io.ktor.utils.io")
+    }
+}

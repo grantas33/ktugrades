@@ -53,20 +53,26 @@ class MySqlProvider(val connection: SuspendingConnection) {
         )
     }
 
-    suspend fun getUserSubscriptions(): List<SubscriptionPayload> = connection.inTransaction {
+    suspend fun getUsersWithSubscriptions(): List<UserSubscriptionData> = connection.inTransaction {
         it.sendPreparedStatement(
             query = """
-                select * from UserSubscriptions
+                select * from User
+                join UserSubscriptions on User.username = UserSubscriptions.userId
             """.trimIndent()
         ).let {
-            it.rows.map {
-                SubscriptionPayload(
-                    username = it["userId"] as ByteArray,
-                    endpoint = it["endpoint"] as String,
-                    key = it["publicKey"] as String,
-                    auth = it["auth"] as String
-                )
-            }
+            it.rows.groupBy { User(username = it["username"] as ByteArray, password = it["password"] as ByteArray) }
+                .map {
+                    UserSubscriptionData(
+                        user = it.key,
+                        subscriptions = it.value.map {
+                            SubscriptionData(
+                                endpoint = it["endpoint"] as String,
+                                publicKey = it["publicKey"] as String,
+                                auth = it["auth"] as String
+                            )
+                        }
+                    )
+                }
         }
     }
 

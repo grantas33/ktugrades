@@ -83,3 +83,12 @@ data class Module (
     val title: String,
     val professor: String
 )
+
+@Serializable
+data class NotificationPayload(
+    val addedMarks: List<MarkInfoResponse>,
+    val updatedMarks: List<MarkInfoResponse>,
+    val latestMarks: List<MarkInfoResponse>
+)
+
+fun List<String>.toMarkString() = this.joinToString(", ") { it.removePrefix("0") }

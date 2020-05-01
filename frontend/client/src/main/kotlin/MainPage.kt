@@ -41,7 +41,7 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
                 PushSubscriptionOptions(userVisibleOnly = true, applicationServerKey = PUSH_API_PUBLIC_KEY)
             ).await()
             sendSubscriptionToServer(subscription)
-            console.log("Subscribed.")
+            console.log("Subscribed")
             setState {
                 pushManagerState = PushManagerState.Subscribed
             }

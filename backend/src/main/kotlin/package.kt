@@ -19,6 +19,7 @@ import java.io.InputStreamReader
 import java.nio.ByteBuffer
 import java.security.KeyPair
 import java.util.*
+import javax.management.monitor.StringMonitor
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
@@ -117,3 +118,7 @@ fun UUID.getBytes(): ByteArray = ByteBuffer.wrap(ByteArray(16)).let {
 }.array()
 
 fun ByteArray.getUUID(): UUID = ByteBuffer.wrap(this).run { UUID(long, long) }
+
+data class UserSubscriptionData(val user: User, val subscriptions: List<SubscriptionData>)
+
+data class SubscriptionData(val endpoint: String, val publicKey: String, val auth: String)

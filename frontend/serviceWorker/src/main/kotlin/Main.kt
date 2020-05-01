@@ -1,3 +1,8 @@
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import org.ktugrades.common.NotificationPayload
+import org.ktugrades.common.Routes
+import org.ktugrades.common.toMarkString
 import org.w3c.fetch.Response
 import org.w3c.notifications.NotificationEvent
 import org.w3c.notifications.NotificationOptions
@@ -9,6 +14,8 @@ external val self: ServiceWorkerGlobalScope
 fun main() {
     installServiceWorker()
 }
+
+val jsonSerializer = Json(configuration = JsonConfiguration.Stable)
 
 const val MAIN_CACHE = "mainCache"
 const val FETCH_CACHE = "fetchCache"
@@ -54,20 +61,31 @@ fun installServiceWorker() {
     self.addEventListener("push", { event ->
         event as PushEvent
         console.log("Push received.")
-        val message = event.data.text()
-        console.log("Push had this data: $message")
+        val payloadString = event.data.text()
+        val notificationPayload = jsonSerializer.parse(NotificationPayload.serializer(), payloadString)
+        val message = notificationPayload.run {
+            when {
+                addedMarks.size + updatedMarks.size > 1 -> "You received ${addedMarks.size + updatedMarks.size} new marks!"
+                addedMarks.size == 1 -> "You received a new mark ${addedMarks.first().marks.toMarkString()}" +
+                    (addedMarks.first().typeId?.let { " for $it" } ?: "") +
+                    " in ${addedMarks.first().title}."
+                updatedMarks.size == 1 -> "Your mark" + (updatedMarks.first().typeId?.let { " for $it" } ?: "") +
+                    " in ${updatedMarks.first().title} got updated to ${updatedMarks.first().marks.toMarkString()}"
+                else -> null
+            }
+        }
 
         if (message != "12") {
             event.waitUntil(
-                    self.registration.showNotification(
-                            title = message,
-                            options = NotificationOptions(
-                                    tag = "tag",
-                                    body = message,
-                                    icon = "/ktu-ikona.png",
-                                    badge = "/ktu-ikona.png"
-                            )
+                self.registration.showNotification(
+                    title = "KTU grades",
+                    options = NotificationOptions(
+                        tag = "tag",
+                        body = message,
+                        icon = "/ktu-ikona.png",
+                        badge = "/ktu-ikona.png"
                     )
+                )
             )
         }
     })

@@ -28,9 +28,9 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
     Security.addProvider(BouncyCastleProvider())
-    val dependencies = Dependencies(environment)
-    val logger = LoggerFactory.getLogger("app")
     val jsonSerializer = Json(configuration = JsonConfiguration.Stable)
+    val dependencies = Dependencies(environment, jsonSerializer)
+    val logger = LoggerFactory.getLogger("app")
 
     install(CORS) {
         method(HttpMethod.Options)
@@ -90,7 +90,9 @@ fun Application.module(testing: Boolean = false) {
             call.respond(HttpStatusCode.OK)
         }
         post("/broadcast") {
-            dependencies.notificationService.broadcastToAll()
+            dependencies.notificationService.broadcastToAll {
+                logger.warn(it.localizedMessage)
+            }
         }
     }
 }

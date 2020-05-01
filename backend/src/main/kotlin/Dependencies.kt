@@ -2,13 +2,15 @@ package org.ktugrades.backend
 
 import com.github.jasync.sql.db.asSuspending
 import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder
+import com.google.gson.JsonSerializer
 import org.ktugrades.backend.handlers.DataHandler
 import org.ktugrades.backend.handlers.LoginHandler
 import io.ktor.application.ApplicationEnvironment
+import kotlinx.serialization.json.Json
 import org.ktugrades.backend.services.*
 
 @Suppress("unused", "EXPERIMENTAL_API_USAGE") // Referenced in application.conf
-class Dependencies(private val appEnvironment: ApplicationEnvironment) {
+class Dependencies(private val appEnvironment: ApplicationEnvironment, private val jsonSerializer: Json) {
 
     val loginHandler by lazy { LoginHandler() }
     private val dataHandler by lazy { DataHandler() }
@@ -17,7 +19,13 @@ class Dependencies(private val appEnvironment: ApplicationEnvironment) {
     }
 
     val notificationService by lazy {
-        NotificationService(mySqlProvider = mySqlProvider)
+        NotificationService(
+            mySqlProvider = mySqlProvider,
+            credentialProvider = credentialProvider,
+            loginHandler = loginHandler,
+            markService = markService,
+            jsonSerializer = jsonSerializer
+        )
     }
 
     val encryptionService by lazy {
