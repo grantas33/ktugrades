@@ -47,9 +47,9 @@ class MySqlProvider(val connection: SuspendingConnection) {
         it.sendPreparedStatement(
             query = """
                 insert into UserSubscriptions (id, userId, endpoint, publicKey, auth) 
-                values (?, ?, ?, ?)
+                values (?, ?, ?, ?, ?)
             """.trimIndent(),
-            values = listOf(UUID.randomUUID(), payload.username, payload.endpoint, payload.key, payload.auth)
+            values = listOf(UUID.randomUUID().getBytes(), payload.username, payload.endpoint, payload.key, payload.auth)
         )
     }
 

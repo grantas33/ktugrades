@@ -8,6 +8,7 @@ import org.ktugrades.common.Module
 import react.RBuilder
 import react.ReactElement
 import react.dom.RDOMBuilder
+import styled.StyledDOMBuilder
 import styled.css
 import styled.styledButton
 import styled.styledDiv
@@ -24,7 +25,7 @@ fun RBuilder.flexBox(block: RDOMBuilder<DIV>.() -> Unit) = styledDiv {
     block()
 }
 
-fun RBuilder.appButton(block: RDOMBuilder<BUTTON>.() -> Unit) = styledButton {
+fun RBuilder.appButton(block: StyledDOMBuilder<BUTTON>.() -> Unit) = styledButton {
     css {
         fontSize = LinearDimension("16px")
         padding = "8px 20px 8px 19px"
@@ -64,6 +65,10 @@ fun RBuilder.moduleComponent(module: Module) = styledDiv {
     styledDiv {
         css {
             fontSize = LinearDimension("2.5rem")
+            mobileView {
+                fontSize = LinearDimension("1.5rem")
+                textAlign = TextAlign.center
+            }
         }
         +module.title
     }
@@ -73,7 +78,13 @@ fun RBuilder.moduleComponent(module: Module) = styledDiv {
             justifyContent = JustifyContent.spaceBetween
         }
         styledDiv { +module.code }
-        styledDiv { +module.professor }
+        styledDiv {
+            css {
+                textAlign = TextAlign.right
+                marginLeft = LinearDimension("5px")
+            }
+            +module.professor
+        }
     }
 }
 
@@ -93,6 +104,12 @@ fun RBuilder.typeComponent(type: MarkType) = styledDiv {
             whiteSpace = WhiteSpace.nowrap
         }
         +"${if (type.weeks.split("-").size > 1) "Weeks" else "Week"} ${type.weeks}"
+    }
+}
+
+fun CSSBuilder.mobileView(block: RuleSet) {
+    media("(max-width: 768px)") {
+        block()
     }
 }
 

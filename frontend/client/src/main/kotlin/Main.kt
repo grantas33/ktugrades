@@ -1,3 +1,4 @@
+import components.mobileView
 import kotlinx.css.*
 import react.dom.render
 import styled.StyledComponents
@@ -25,9 +26,12 @@ fun main() {
             fontSize = LinearDimension("2.5rem")
             paddingLeft = LinearDimension("2px")
             paddingRight = LinearDimension("2px")
+            mobileView {
+                fontSize = LinearDimension("100%")
+            }
         }
         table {
-            borderSpacing = LinearDimension("15px")
+            borderSpacing = LinearDimension("15px 40px")
         }
     }
 

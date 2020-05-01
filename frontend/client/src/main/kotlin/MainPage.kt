@@ -1,16 +1,16 @@
-import components.flexBox
-import components.grades
+import components.*
 import io.ktor.client.request.post
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import org.ktugrades.common.SubscriptionPayload
 import kotlinx.coroutines.*
+import kotlinx.css.*
 import kotlinx.html.js.onClickFunction
 import org.khronos.webgl.Uint8Array
 import org.ktugrades.common.Routes
 import react.*
 import react.dom.div
-import styled.styledButton
+import styled.css
 import kotlin.browser.window
 
 interface MainPageProps: RProps, LocalStorageProps {
@@ -69,10 +69,22 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
 
     override fun RBuilder.render() {
         flexBox {
-            grades {  }
+            child(functionalComponent = Grades)
             if (state.pushManagerState == PushManagerState.NotSubscribed) {
                  div {
-                    styledButton {
+                    appButton {
+                        css {
+                            position = Position.fixed
+                            bottom = LinearDimension("0")
+                            left = LinearDimension("0")
+                            width = LinearDimension("100%")
+                            height = LinearDimension("60px")
+                            background = Color.white.value
+                            mobileView {
+                                height = LinearDimension("20%")
+                                fontSize = LinearDimension("6vw")
+                            }
+                        }
                         attrs {
                             onClickFunction = { subscribeUser() }
                         }

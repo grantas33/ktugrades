@@ -1,4 +1,6 @@
 import components.appButton
+import components.loadingComponent
+import components.mobileView
 import io.ktor.client.call.receive
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
@@ -26,6 +28,7 @@ interface LoginPageState: RState {
     var username: String
     var password: String
     var errorMessage: String?
+    var isLoading: Boolean
 }
 
 class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
@@ -40,6 +43,9 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
             contentType(ContentType.Application.Json)
             body = Credentials(username = state.username, password = state.password)
         }.let {
+            setState {
+                isLoading = false
+            }
             when {
                 it.status.isSuccess() -> {
                     val encrypted = it.receive<EncryptedUsername>()
@@ -63,6 +69,9 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
                 display = Display.flex
                 justifyContent = JustifyContent.center
                 width = LinearDimension("100%")
+                mobileView {
+                    flexDirection = FlexDirection.column
+                }
             }
             styledLabel {
                 +label
@@ -95,7 +104,16 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
                 alignItems = Align.center
                 fontSize = LinearDimension("1.8rem")
             }
-            +"Please enter your KTU network username and password to proceed."
+            styledDiv {
+                css {
+                    mobileView {
+                        textAlign = TextAlign.center
+                        marginBottom = LinearDimension("50px")
+                    }
+                }
+                +"Please enter your KTU network username and password to proceed."
+            }
+
             loginInput(label = "Username", inputType = InputType.text) {
                 setState { username = it }
             }
@@ -112,17 +130,26 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
                         type = ButtonType.submit
                         onClickFunction = {
                             it.preventDefault()
-                            if (state.username.isNotBlank() && state.password.isNotBlank()) authenticateUser()
+                            if (state.username.isNotBlank() && state.password.isNotBlank()) {
+                                setState {
+                                    isLoading = true
+                                }
+                                authenticateUser()
+                            }
                         }
                     }
                 }
             }
-            styledDiv {
-                css {
-                    color = Color.tomato
-                    marginTop = LinearDimension("20px")
+            when {
+                state.isLoading -> loadingComponent()
+                state.errorMessage.isNullOrEmpty().not() -> styledDiv {
+                    css {
+                        color = Color.tomato
+                        marginTop = LinearDimension("20px")
+                        textAlign = TextAlign.center
+                    }
+                    state.errorMessage?.let {+it}
                 }
-                state.errorMessage?.let { +it }
             }
         }
     }
