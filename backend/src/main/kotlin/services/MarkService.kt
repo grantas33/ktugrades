@@ -4,7 +4,6 @@ import org.joda.time.DateTime
 import org.ktugrades.backend.MarkAggregationResult
 import org.ktugrades.backend.MarkInfo
 import org.ktugrades.backend.handlers.DataHandler
-import org.ktugrades.backend.sort
 import org.ktugrades.common.Module
 import java.lang.RuntimeException
 import java.util.*
@@ -62,7 +61,7 @@ class MarkService(private val dataHandler: DataHandler, private val mySqlProvide
             .distinct()
 
         val updatedMarks = (markInfoToAddAndNotify + markInfoToUpdateAndNotify + markInfoToUpdate)
-        val latestMarks = (databaseMarks.filter { dbMark -> updatedMarks.any { dbMark.id == it.id }.not() } + updatedMarks).sort().take(50)
+        val latestMarks = (databaseMarks.filter { dbMark -> updatedMarks.any { dbMark.id == it.id }.not() } + updatedMarks).take(50)
 
         return MarkAggregationResult(
             markInfoToAddAndNotify = markInfoToAddAndNotify,

@@ -28,7 +28,6 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
     Security.addProvider(BouncyCastleProvider())
-    val jsonSerializer = Json(configuration = JsonConfiguration.Stable)
     val dependencies = Dependencies(environment, jsonSerializer)
     val logger = LoggerFactory.getLogger("app")
 

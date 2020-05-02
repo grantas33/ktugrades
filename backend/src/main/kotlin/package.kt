@@ -105,13 +105,6 @@ fun MarkInfo.toResponse(): MarkInfoResponse = MarkInfoResponse(
     marks = marks
 )
 
-fun List<MarkInfo>.sort() = this
-    .sortedWith(compareByDescending<MarkInfo> {it.date}
-        .thenByDescending {it.semesterCode }
-        .thenByDescending {it.week.split("-").map {it.toInt()}.average()}
-        .thenBy {it.title}
-    )
-
 fun UUID.getBytes(): ByteArray = ByteBuffer.wrap(ByteArray(16)).let {
     it.putLong(this.mostSignificantBits)
     it.putLong(this.leastSignificantBits)

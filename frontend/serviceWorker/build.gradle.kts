@@ -4,6 +4,10 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+dependencies {
+    implementation(project(":frontend:commonFrontend"))
+}
+
 kotlin {
     target {
         browser {

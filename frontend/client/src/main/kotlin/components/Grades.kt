@@ -3,13 +3,11 @@ package components
 import MarkState
 import MarkType
 import SERVER_URL
-import getUsername
 import hooks.useMobileView
 import io.ktor.client.call.receive
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.isSuccess
-import json
 import jsonClient
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -19,7 +17,10 @@ import react.*
 import react.dom.h1
 import react.dom.tbody
 import react.dom.thead
+import services.getUsername
+import sort
 import styled.*
+import kotlin.browser.window
 
 interface GradesProps: RProps
 
@@ -30,12 +31,12 @@ val Grades = functionalComponent<GradesProps> {
 
     useEffect (dependencies = listOf()) {
         MainScope().launch {
-            val serializedUsername = json.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = getUsername()!!))
+            val serializedUsername = jsonSerializer.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = window.caches.getUsername()!!))
             jsonClient.get<HttpResponse>("${SERVER_URL}${Routes.Grades}?username=${serializedUsername}").let {
                 when {
                     it.status.isSuccess() -> {
                         val marks = it.receive<List<MarkInfoResponse>>()
-                        setMarkState(MarkState.Success(marks = marks))
+                        setMarkState(MarkState.Success(marks = marks.sort()))
                     }
                     else -> {
                         val error = it.receive<ErrorMessage>()

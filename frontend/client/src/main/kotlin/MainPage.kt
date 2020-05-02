@@ -10,6 +10,7 @@ import org.khronos.webgl.Uint8Array
 import org.ktugrades.common.Routes
 import react.*
 import react.dom.div
+import services.getUsername
 import styled.css
 import kotlin.browser.window
 
@@ -53,7 +54,7 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
     private suspend fun sendSubscriptionToServer(subscription: PushSubscription) {
         if (!isCredentialsExisting()) props.setCredentialsExisting(false)
         val payload = SubscriptionPayload(
-                username = getUsername()!!,
+                username = window.caches.getUsername()!!,
                 endpoint = subscription.endpoint,
                 key = subscription.getKey("p256dh")
                     .let { window.btoa(js("String").fromCharCode.apply(null, Uint8Array(it)) as String) },

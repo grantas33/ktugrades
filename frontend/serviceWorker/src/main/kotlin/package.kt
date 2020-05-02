@@ -17,14 +17,4 @@ open external class PushEvent(type: String, eventInitDict: ExtendableEventInit =
     val data: PushMessageData
 }
 
-const val SERVER_URL = "http://127.0.0.1:5000"
-
-inline fun jsObject(init: dynamic.() -> Unit): dynamic {
-    val o = js("{}")
-    init(o)
-    return o
-}
-
-val applicationJsonHeaders = jsObject { this["Content-type"] = "application/json" }
-
 external fun encodeURIComponent(component: String): String

@@ -1,12 +1,16 @@
 package org.ktugrades.common
 
 import kotlinx.serialization.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 
 object Routes {
     const val Authenticate = "/authenticate"
     const val Grades = "/grades"
     const val Subscription = "/subscription"
 }
+
+val jsonSerializer = Json(configuration = JsonConfiguration.Stable)
 
 @Serializable
 data class Credentials(val username: String, val password: String)

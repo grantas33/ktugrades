@@ -14,4 +14,5 @@ rootProject.name = "ktugrades"
 include("backend")
 include(":frontend:client")
 include(":frontend:serviceWorker")
+include(":frontend:commonFrontend")
 include("common")

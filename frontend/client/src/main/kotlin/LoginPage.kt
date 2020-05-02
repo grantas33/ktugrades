@@ -19,8 +19,9 @@ import org.ktugrades.common.ErrorMessage
 import org.ktugrades.common.Routes
 import org.w3c.dom.HTMLInputElement
 import react.*
-import services.putDataInCache
+import services.putInCache
 import styled.*
+import kotlin.browser.window
 
 interface LoginPageProps: RProps, CacheProps
 
@@ -49,7 +50,7 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
             when {
                 it.status.isSuccess() -> {
                     val encrypted = it.receive<EncryptedUsername>()
-                    putDataInCache(key = "username", data = encrypted.username.contentToString())
+                    window.caches.putInCache(DATA_CACHE, key = "username", data = encrypted.username.contentToString())
                     props.setCredentialsExisting(true)
                 }
                 else -> {
