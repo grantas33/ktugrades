@@ -19,10 +19,10 @@ import org.ktugrades.common.ErrorMessage
 import org.ktugrades.common.Routes
 import org.w3c.dom.HTMLInputElement
 import react.*
+import services.putDataInCache
 import styled.*
-import kotlin.browser.localStorage
 
-interface LoginPageProps: RProps, LocalStorageProps
+interface LoginPageProps: RProps, CacheProps
 
 interface LoginPageState: RState {
     var username: String
@@ -49,8 +49,8 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
             when {
                 it.status.isSuccess() -> {
                     val encrypted = it.receive<EncryptedUsername>()
-                    localStorage.setItem("username", encrypted.username.contentToString())
-                    props.notifyLocalStorageUpdated()
+                    putDataInCache(key = "username", data = encrypted.username.contentToString())
+                    props.setCredentialsExisting(true)
                 }
                 else -> {
                     val error = it.receive<ErrorMessage>()

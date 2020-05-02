@@ -1,3 +1,3 @@
-interface LocalStorageProps {
-    var notifyLocalStorageUpdated: () -> Unit
+interface CacheProps {
+    var setCredentialsExisting: (isCredentialsExist: Boolean) -> Unit
 }

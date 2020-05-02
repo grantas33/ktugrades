@@ -13,7 +13,7 @@ import react.dom.div
 import styled.css
 import kotlin.browser.window
 
-interface MainPageProps: RProps, LocalStorageProps {
+interface MainPageProps: RProps, CacheProps {
     var pushManager: PushManager
 }
 interface MainPageState: RState {
@@ -51,7 +51,7 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
     }
 
     private suspend fun sendSubscriptionToServer(subscription: PushSubscription) {
-        if (!isCredentialsExisting()) props.notifyLocalStorageUpdated()
+        if (!isCredentialsExisting()) props.setCredentialsExisting(false)
         val payload = SubscriptionPayload(
                 username = getUsername()!!,
                 endpoint = subscription.endpoint,

@@ -18,6 +18,7 @@ subprojects {
     dependencies {
         implementation(kotlin("stdlib-js"))
         implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.4")
         implementation(project(":common"))
     }
 

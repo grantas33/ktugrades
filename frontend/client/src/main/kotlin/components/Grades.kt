@@ -29,8 +29,8 @@ val Grades = functionalComponent<GradesProps> {
     val isMobileView = useMobileView()
 
     useEffect (dependencies = listOf()) {
-        val serializedUsername = json.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = getUsername()!!))
         MainScope().launch {
+            val serializedUsername = json.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = getUsername()!!))
             jsonClient.get<HttpResponse>("${SERVER_URL}${Routes.Grades}?username=${serializedUsername}").let {
                 when {
                     it.status.isSuccess() -> {

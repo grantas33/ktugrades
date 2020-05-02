@@ -40,8 +40,7 @@ class NotificationService(
                         if (markInfoToAddAndNotify.isNotEmpty() || markInfoToUpdateAndNotify.isNotEmpty()) {
                             val notificationPayload = NotificationPayload(
                                 addedMarks = markInfoToAddAndNotify.map { it.toResponse() },
-                                updatedMarks = markInfoToUpdateAndNotify.map { it.toResponse() },
-                                latestMarks = latestMarks.map {it.toResponse() }
+                                updatedMarks = markInfoToUpdateAndNotify.map { it.toResponse() }
                             )
                             it.subscriptions.forEach {
                                 pushService.send(

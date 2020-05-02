@@ -1,9 +1,12 @@
+import kotlinx.coroutines.*
+import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import org.ktugrades.common.NotificationPayload
-import org.ktugrades.common.Routes
-import org.ktugrades.common.toMarkString
+import org.ktugrades.common.*
+import org.w3c.fetch.Request
+import org.w3c.fetch.RequestInit
 import org.w3c.fetch.Response
+import org.w3c.fetch.ResponseInit
 import org.w3c.notifications.NotificationEvent
 import org.w3c.notifications.NotificationOptions
 import org.w3c.workers.*
@@ -19,6 +22,7 @@ val jsonSerializer = Json(configuration = JsonConfiguration.Stable)
 
 const val MAIN_CACHE = "mainCache"
 const val FETCH_CACHE = "fetchCache"
+const val DATA_CACHE = "dataCache"
 
 fun installServiceWorker() {
     val offlineContent = arrayOf(
@@ -75,7 +79,30 @@ fun installServiceWorker() {
             }
         }
 
-        if (message != "12") {
+        MainScope().launch {
+            val dataCache = self.caches.open(DATA_CACHE).await()
+            val str = dataCache.match("username").await()?.unsafeCast<Response>()?.text()?.await()
+            val username: ByteArray? = str?.let { JSON.parse(it) }
+            requireNotNull( username)
+            val serializedUsername = jsonSerializer.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = username))
+            val fetchCache = self.caches.open(FETCH_CACHE).await()
+            val request = "${SERVER_URL}${Routes.Grades}?username=${encodeURIComponent(serializedUsername)}"
+            val requestObj = Request(request, RequestInit(headers = applicationJsonHeaders))
+            val cachedMarksString = requireNotNull(fetchCache.match(requestObj).await()?.unsafeCast<Response>()?.text()?.await())
+            val cachedMarks = jsonSerializer.parse(MarkInfoResponse.serializer().list, cachedMarksString)
+            val updatedMarks = (cachedMarks + notificationPayload.addedMarks + notificationPayload.updatedMarks)
+                .sortedWith(compareByDescending<MarkInfoResponse> { it.date.millis }
+                    .thenByDescending { it.semesterCode }
+                    .thenByDescending { it.week.split("-").map { it.toInt() }.average() }
+                    .thenBy { it.title }
+                )
+            fetchCache.put(request, Response(
+                body = jsonSerializer.stringify(MarkInfoResponse.serializer().list, updatedMarks),
+                init = ResponseInit(headers = applicationJsonHeaders)
+            ))
+        }
+
+        if (message != null) {
             event.waitUntil(
                 self.registration.showNotification(
                     title = "KTU grades",

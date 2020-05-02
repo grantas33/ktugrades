@@ -87,8 +87,7 @@ data class Module (
 @Serializable
 data class NotificationPayload(
     val addedMarks: List<MarkInfoResponse>,
-    val updatedMarks: List<MarkInfoResponse>,
-    val latestMarks: List<MarkInfoResponse>
+    val updatedMarks: List<MarkInfoResponse>
 )
 
 fun List<String>.toMarkString() = this.joinToString(", ") { it.removePrefix("0") }
