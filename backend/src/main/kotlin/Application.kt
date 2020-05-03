@@ -88,6 +88,11 @@ fun Application.module(testing: Boolean = false) {
             dependencies.mySqlProvider.insertUserSubscription(payload)
             call.respond(HttpStatusCode.OK)
         }
+        post (Routes.Unsubscription) {
+            val payload = call.receive<UnsubscriptionPayload>()
+            dependencies.mySqlProvider.deleteUserSubscription(payload)
+            call.respond(HttpStatusCode.OK)
+        }
         post("/broadcast") {
             dependencies.notificationService.broadcastToAll {
                 logger.warn(it.localizedMessage)

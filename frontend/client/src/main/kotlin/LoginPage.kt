@@ -50,7 +50,7 @@ class LoginPage: RComponent<LoginPageProps, LoginPageState>() {
             when {
                 it.status.isSuccess() -> {
                     val encrypted = it.receive<EncryptedUsername>()
-                    window.caches.putInCache(DATA_CACHE, key = "username", data = encrypted.username.contentToString())
+                    window.caches.putInCache(DATA_CACHE, key = CACHE_USERNAME, data = encrypted.username.contentToString())
                     props.setCredentialsExisting(true)
                 }
                 else -> {

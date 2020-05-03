@@ -7,6 +7,7 @@ import org.joda.time.LocalDateTime
 import org.ktugrades.backend.*
 import org.ktugrades.common.Module
 import org.ktugrades.common.SubscriptionPayload
+import org.ktugrades.common.UnsubscriptionPayload
 import java.lang.RuntimeException
 import java.util.*
 
@@ -50,6 +51,15 @@ class MySqlProvider(val connection: SuspendingConnection) {
                 values (?, ?, ?, ?, ?)
             """.trimIndent(),
             values = listOf(UUID.randomUUID().getBytes(), payload.username, payload.endpoint, payload.key, payload.auth)
+        )
+    }
+
+    suspend fun deleteUserSubscription(payload: UnsubscriptionPayload) = connection.inTransaction {
+        it.sendPreparedStatement(
+            query = """
+                delete from UserSubscriptions where endpoint = ? and publicKey = ? and auth = ?
+            """.trimIndent(),
+            values = listOf(payload.endpoint, payload.key, payload.auth)
         )
     }
 

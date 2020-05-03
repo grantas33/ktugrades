@@ -21,14 +21,4 @@ subprojects {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.4")
         implementation(project(":common"))
     }
-
-    tasks.register<Copy>("copyDistribution") {
-        group = "build"
-        description = "Copies a distribution to the root project distribution."
-
-        from("$buildDir/distributions")
-        into("${parent?.buildDir}/distributions")
-    }
-
-    tasks["build"].finalizedBy("copyDistribution")
 }

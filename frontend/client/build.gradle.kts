@@ -28,6 +28,16 @@ dependencies {
     implementation(project(":frontend:commonFrontend"))
 }
 
+tasks.register<Copy>("copyDistribution") {
+    group = "build"
+    description = "Copies a distribution to the root project distribution."
+
+    from("$buildDir/distributions")
+    into("${parent?.buildDir}/distributions")
+}
+
+tasks["build"].finalizedBy("copyDistribution")
+
 kotlin.target.browser {
     @Suppress("EXPERIMENTAL_API_USAGE")
     dceTask {

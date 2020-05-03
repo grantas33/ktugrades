@@ -1,5 +1,6 @@
 package services
 
+import CACHE_USERNAME
 import DATA_CACHE
 import kotlinx.coroutines.await
 import org.w3c.fetch.Response
@@ -17,5 +18,9 @@ suspend fun CacheStorage.isKeyExistingInCache(cache: String, key: String): Boole
     return this.open(cache).await().match(key).await() != null
 }
 
-suspend fun CacheStorage.getUsername(): ByteArray? = getTextInCache(DATA_CACHE,"username")?.let { JSON.parse(it) }
+suspend fun CacheStorage.removeInCache(cache: String, key: Any): Boolean {
+    return this.open(cache).await().delete(key).await()
+}
+
+suspend fun CacheStorage.getUsername(): ByteArray? = getTextInCache(DATA_CACHE, CACHE_USERNAME)?.let { JSON.parse(it) }
 

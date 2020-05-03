@@ -6,7 +6,6 @@ import org.ktugrades.common.SubscriptionPayload
 import kotlinx.coroutines.*
 import kotlinx.css.*
 import kotlinx.html.js.onClickFunction
-import org.khronos.webgl.Uint8Array
 import org.ktugrades.common.Routes
 import react.*
 import react.dom.div
@@ -56,10 +55,8 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
         val payload = SubscriptionPayload(
                 username = window.caches.getUsername()!!,
                 endpoint = subscription.endpoint,
-                key = subscription.getKey("p256dh")
-                    .let { window.btoa(js("String").fromCharCode.apply(null, Uint8Array(it)) as String) },
-                auth = subscription.getKey("auth")
-                    .let { window.btoa(js("String").fromCharCode.apply(null, Uint8Array(it)) as String) }
+                key = subscription.getKeyForRequest(),
+                auth = subscription.getAuthForRequest()
             )
 
         jsonClient.post<Unit>(SERVER_URL + Routes.Subscription) {
@@ -69,7 +66,18 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
     }
 
     override fun RBuilder.render() {
-        child(functionalComponent = Logout)
+        if (state.pushManagerState != PushManagerState.Loading) {
+            child(
+                functionalComponent = Logout,
+                props = PushManagerState.Subscribed.let { subscribedState ->
+                    jsObject {
+                        pushManager = if (state.pushManagerState == subscribedState) props.pushManager else null
+                        setCredentialsExisting = props.setCredentialsExisting
+                    }
+                }
+            )
+        }
+
         child(functionalComponent = Grades)
         if (state.pushManagerState == PushManagerState.NotSubscribed) {
             div {

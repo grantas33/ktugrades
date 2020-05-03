@@ -37,6 +37,11 @@ external class PushSubscription {
     fun unsubscribe(): Promise<Boolean>
 }
 
+fun PushSubscription.getKeyForRequest(): String = getKey(name = "p256dh").convertToString()
+fun PushSubscription.getAuthForRequest(): String = getKey(name = "auth").convertToString()
+
+fun ArrayBuffer.convertToString(): String = window.btoa(js("String").fromCharCode.apply(null, Uint8Array(this)) as String)
+
 inline val ServiceWorkerRegistration.pushManager: PushManager
     get() = asDynamic().pushManager as PushManager
 
@@ -49,7 +54,7 @@ external class PushManager {
     fun subscribe(options: PushSubscriptionOptions): Promise<PushSubscription>
 }
 
-suspend fun isCredentialsExisting() = window.caches.isKeyExistingInCache(DATA_CACHE,"username")
+suspend fun isCredentialsExisting() = window.caches.isKeyExistingInCache(DATA_CACHE, CACHE_USERNAME)
 
 data class MarkType(val typeId: String?, val weeks: String)
 

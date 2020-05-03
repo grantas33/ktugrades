@@ -8,6 +8,7 @@ object Routes {
     const val Authenticate = "/authenticate"
     const val Grades = "/grades"
     const val Subscription = "/subscription"
+    const val Unsubscription = "/unsubscription"
 }
 
 val jsonSerializer = Json(configuration = JsonConfiguration.Stable)
@@ -60,6 +61,9 @@ data class SubscriptionPayload(val username: ByteArray, val endpoint: String, va
         return result
     }
 }
+
+@Serializable
+data class UnsubscriptionPayload(val endpoint: String, val key: String, val auth: String)
 
 @Serializable(with = CommonDateTimeSerializer::class)
 expect class CommonDateTime(millis: Long) {

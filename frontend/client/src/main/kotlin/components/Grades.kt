@@ -29,8 +29,8 @@ val Grades = functionalComponent<GradesProps> {
     val (markState, setMarkState) = useState(MarkState.Loading as MarkState)
     val isMobileView = useMobileView()
 
-    useEffect (dependencies = listOf()) {
-        MainScope().launch {
+    useEffectWithCleanup (dependencies = listOf()) {
+        val job = MainScope().launch {
             val serializedUsername = jsonSerializer.stringify(EncryptedUsername.serializer(), EncryptedUsername(username = window.caches.getUsername()!!))
             jsonClient.get<HttpResponse>("${SERVER_URL}${Routes.Grades}?username=${serializedUsername}").let {
                 when {
@@ -45,6 +45,8 @@ val Grades = functionalComponent<GradesProps> {
                 }
             }
         }
+
+        return@useEffectWithCleanup { job.cancel() }
     }
 
     when (markState) {
