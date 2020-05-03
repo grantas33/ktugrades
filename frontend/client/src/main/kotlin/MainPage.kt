@@ -69,28 +69,27 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
     }
 
     override fun RBuilder.render() {
-        flexBox {
-            child(functionalComponent = Grades)
-            if (state.pushManagerState == PushManagerState.NotSubscribed) {
-                 div {
-                    appButton {
-                        css {
-                            position = Position.fixed
-                            bottom = LinearDimension("0")
-                            left = LinearDimension("0")
-                            width = LinearDimension("100%")
-                            height = LinearDimension("60px")
-                            background = Color.white.value
-                            mobileView {
-                                height = LinearDimension("20%")
-                                fontSize = LinearDimension("6vw")
-                            }
+        child(functionalComponent = Logout)
+        child(functionalComponent = Grades)
+        if (state.pushManagerState == PushManagerState.NotSubscribed) {
+            div {
+                appButton {
+                    css {
+                        position = Position.fixed
+                        bottom = LinearDimension("0")
+                        left = LinearDimension("0")
+                        width = LinearDimension("100%")
+                        height = LinearDimension("60px")
+                        background = Color.white.value
+                        mobileView {
+                            height = LinearDimension("20%")
+                            fontSize = LinearDimension("6vw")
                         }
-                        attrs {
-                            onClickFunction = { subscribeUser() }
-                        }
-                        +"Subscribe to push notifications to receive a notification on this device upon receiving a mark."
                     }
+                    attrs {
+                        onClickFunction = { subscribeUser() }
+                    }
+                    +"Subscribe to push notifications to receive a notification on this device upon receiving a mark."
                 }
             }
         }

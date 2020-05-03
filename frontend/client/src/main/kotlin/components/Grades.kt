@@ -47,11 +47,15 @@ val Grades = functionalComponent<GradesProps> {
         }
     }
 
-    flexBox {
-        when (markState) {
-            is MarkState.Success -> {
-                when {
-                    isMobileView -> markState.marks.map {
+    when (markState) {
+        is MarkState.Success -> {
+            when {
+                isMobileView -> styledDiv {
+                    css {
+                        position = Position.relative
+                        top = LinearDimension("50px")
+                    }
+                    markState.marks.map {
                         styledDiv {
                             css {
                                 display = Display.flex
@@ -77,32 +81,32 @@ val Grades = functionalComponent<GradesProps> {
                             }
                         }
                     }
-                    else -> styledTable {
-                        thead {
-                            styledTr {
-                                styledTh { +"Mark" }
-                                styledTh { +"Module" }
-                                styledTh { +"Type" }
-                                styledTh { +"Date" }
-                            }
+                }
+                else -> styledTable {
+                    thead {
+                        styledTr {
+                            styledTh { +"Mark" }
+                            styledTh { +"Module" }
+                            styledTh { +"Type" }
+                            styledTh { +"Date" }
                         }
-                        tbody {
-                            markState.marks.map {
-                                styledTr {
-                                    styledTd { markComponent(it.marks) }
-                                    styledTd { moduleComponent(Module(it.moduleCode, it.semesterCode, it.title, it.professor)) }
-                                    styledTd { typeComponent(MarkType(it.typeId, it.week)) }
-                                    styledTd { +it.date.getFormatted() }
-                                }
+                    }
+                    tbody {
+                        markState.marks.map {
+                            styledTr {
+                                styledTd { markComponent(it.marks) }
+                                styledTd { moduleComponent(Module(it.moduleCode, it.semesterCode, it.title, it.professor)) }
+                                styledTd { typeComponent(MarkType(it.typeId, it.week)) }
+                                styledTd { +it.date.getFormatted() }
                             }
                         }
                     }
                 }
             }
-            is MarkState.Error -> h1 {
-                +markState.error.message
-            }
-            is MarkState.Loading -> loadingComponent()
         }
+        is MarkState.Error -> h1 {
+            +markState.error.message
+        }
+        is MarkState.Loading -> loadingComponent()
     }
 }
