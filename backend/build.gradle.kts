@@ -7,7 +7,9 @@ object Versions {
     const val bouncyCastle = "1.64"
     const val jasync = "1.0.14"
     const val serialization = "0.20.0"
-
+    const val mockk = "1.9.3"
+    const val junit = "5.6.1"
+    const val coroutines = "1.3.5"
 }
 
 plugins {
@@ -45,6 +47,13 @@ dependencies {
     implementation("org.bouncycastle:bcpkix-jdk15on:${Versions.bouncyCastle}")
     implementation("com.github.jasync-sql:jasync-mysql:${Versions.jasync}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.serialization}")
-    testImplementation("io.ktor:ktor-server-tests:${Versions.ktor}")
     implementation(project(":common"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit}")
+    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit5"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
+    testImplementation("io.mockk:mockk:${Versions.mockk}")
+    testImplementation("io.ktor:ktor-client-mock-jvm:${Versions.ktor}")
 }
