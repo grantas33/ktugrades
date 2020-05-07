@@ -78,8 +78,7 @@ data class MarkAggregationResult(
     val markInfoToAddAndNotify: List<MarkInfo>,
     val markInfoToUpdateAndNotify: List<MarkInfo>,
     val markInfoToUpdate: List<MarkInfo>,
-    val latestMarks: List<MarkInfo>,
-    val newModules: List<Module>
+    val latestMarks: List<MarkInfo>
 )
 
 data class MarkInfo(
@@ -103,6 +102,14 @@ fun MarkInfo.toResponse(): MarkInfoResponse = MarkInfoResponse(
     week = week,
     date = CommonDateTime(this.date.millis),
     marks = marks
+)
+
+data class MarkSlot(
+    val moduleCode: String,
+    val semesterCode: String,
+    val typeId: String?,
+    val week: String,
+    val averageMark: Float?
 )
 
 fun UUID.getBytes(): ByteArray = ByteBuffer.wrap(ByteArray(16)).let {

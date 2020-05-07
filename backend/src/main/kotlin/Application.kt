@@ -70,8 +70,7 @@ fun Application.module() {
                 dependencies.run {
                     loginHandler.getAuthCookie(credentials.username, credentials.password)
                     markService.getMarks(encrypted.username).let {
-                        mySqlProvider.insertModules(it.newModules)
-                        mySqlProvider.insertMarks(marks = it.markInfoToAddAndNotify, user = encrypted.username)
+                        mySqlProvider.insertNewMarkInformation(marks = it.markInfoToAddAndNotify, user = encrypted.username)
                         mySqlProvider.updateMarks(it.markInfoToUpdate + it.markInfoToUpdateAndNotify, encrypted.username)
                         call.respond(
                             status = HttpStatusCode.OK,

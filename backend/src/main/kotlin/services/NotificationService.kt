@@ -34,8 +34,7 @@ class NotificationService(
                     loginHandler.getAuthCookie(credentials.username, credentials.password)
                     val markAggregationResult = markService.getMarks(it.user.username)
                     markAggregationResult.run {
-                        mySqlProvider.insertModules(newModules)
-                        mySqlProvider.insertMarks(marks = markInfoToAddAndNotify, user = it.user.username)
+                        mySqlProvider.insertNewMarkInformation(marks = markInfoToAddAndNotify, user = it.user.username)
                         mySqlProvider.updateMarks(markInfoToUpdate + markInfoToUpdateAndNotify, it.user.username)
                         if (markInfoToAddAndNotify.isNotEmpty() || markInfoToUpdateAndNotify.isNotEmpty()) {
                             val notificationPayload = NotificationPayload(

@@ -90,7 +90,11 @@ class MySqlProvider(val connection: SuspendingConnection) {
         it.sendPreparedStatement(
             query = """
                 select MarkInformation.*, Module.title, Module.professor, group_concat(Mark.mark) as `marks` from MarkInformation
-                join Module on MarkInformation.moduleCode = Module.code and MarkInformation.semesterCode = Module.semesterCode
+                join MarkSlot on MarkInformation.moduleCode = MarkSlot.moduleCode 
+                    and MarkInformation.semesterCode = MarkSlot.semesterCode
+                    and MarkInformation.typeId = MarkSlot.typeId
+                    and MarkInformation.week = MarkSlot.week
+                join Module on MarkSlot.moduleCode = Module.code and MarkSlot.semesterCode = Module.semesterCode
                 join Mark on MarkInformation.id = Mark.markInformationId
                 where MarkInformation.userId = ?
                 group by MarkInformation.id
@@ -113,27 +117,35 @@ class MySqlProvider(val connection: SuspendingConnection) {
         }
     }
 
-    suspend fun insertModules(modules: List<Module>) = connection.inTransaction {
-        if (modules.isNotEmpty()) {
+    suspend fun insertNewMarkInformation(marks: List<MarkInfo>, user: ByteArray) = connection.inTransaction {
+        if (marks.isNotEmpty()) {
+            val modules = marks.map { Module(code = it.moduleCode, semesterCode = it.semesterCode, title = it.title, professor = it.professor) }
+                .distinct()
             it.sendPreparedStatement(
                 query = """
                 insert into Module (code, semesterCode, title, professor) 
                 values ${modules.joinToString(", ") { "(?, ?, ?, ?)" }}
-                on duplicate key update title=values(title), professor=values(professor)
+                on duplicate key update code=code, semesterCode=semesterCode
             """.trimIndent(),
                 values = modules.map { listOf(it.code, it.semesterCode, it.title, it.professor )}.flatten()
             )
-        }
 
-    }
+            val markSlots = marks.map { MarkSlot(it.moduleCode, it.semesterCode, it.typeId, it.week, null) }
+                .distinct()
+            it.sendPreparedStatement(
+                query = """
+                insert into MarkSlot (moduleCode, semesterCode, typeId, week, averageMark) 
+                values ${markSlots.joinToString(", ") { "(?, ?, ?, ?, ?)" }}
+                on duplicate key update moduleCode=moduleCode, semesterCode=semesterCode, typeId=typeId, week=week
+            """.trimIndent(),
+                values = markSlots.map { listOf(it.moduleCode, it.semesterCode, it.typeId, it.week, it.averageMark )}.flatten()
+            )
 
-    suspend fun insertMarks(marks: List<MarkInfo>, user: ByteArray) = connection.inTransaction {
-        if (marks.isNotEmpty()) {
             it.sendPreparedStatement(
                 query = """
                 insert into MarkInformation (id, moduleCode, semesterCode, userId, typeId, week, date) 
                 values ${marks.joinToString(", ") { "(?, ?, ?, ?, ?, ?, ?)" }}
-            """.trimIndent(),
+        """.trimIndent(),
                 values = marks.map { listOf(it.id.getBytes(), it.moduleCode, it.semesterCode, user, it.typeId, it.week, it.date )}.flatten()
             )
 
@@ -141,7 +153,7 @@ class MySqlProvider(val connection: SuspendingConnection) {
                 query = """
                 insert into Mark (id, markInformationId, mark) 
                 values ${marks.flatMap { it.marks }.joinToString(", ") { "(?, ?, ?)" }}
-            """.trimIndent(),
+        """.trimIndent(),
                 values = marks.map { markInfo ->  markInfo.marks.map { listOf(UUID.randomUUID().getBytes(), markInfo.id.getBytes(), it) }.flatten()}.flatten()
             )
         }
@@ -153,7 +165,7 @@ class MySqlProvider(val connection: SuspendingConnection) {
                 query = """
                 insert into MarkInformation (id, moduleCode, semesterCode, userId, typeId, week, date) 
                 values ${marks.joinToString(", ") { "(?, ?, ?, ?, ?, ?, ?)" }}
-                on duplicate key update moduleCode=values(moduleCode), semesterCode=values(semesterCode), userId=values(userId), typeId=values(typeId), week=values(week), date=values(date)
+                on duplicate key update date=values(date)
             """.trimIndent(),
                 values = marks.map { listOf(it.id.getBytes(), it.moduleCode, it.semesterCode, user, it.typeId, it.week, it.date )}.flatten()
             )

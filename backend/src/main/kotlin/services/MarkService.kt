@@ -48,18 +48,6 @@ class MarkService(private val dataHandler: DataHandler, private val mySqlProvide
             }
         }
 
-        val newModules = markInfoToAddAndNotify
-            .filter { newMark -> databaseMarks.any { it.moduleCode == newMark.moduleCode && it.semesterCode == newMark.semesterCode }.not() }
-            .map {
-                Module(
-                    code = it.moduleCode,
-                    semesterCode = it.semesterCode,
-                    title = it.title,
-                    professor = it.professor
-                )
-            }
-            .distinct()
-
         val updatedMarks = (markInfoToAddAndNotify + markInfoToUpdateAndNotify + markInfoToUpdate)
         val latestMarks = (databaseMarks.filter { dbMark -> updatedMarks.any { dbMark.id == it.id }.not() } + updatedMarks).take(50)
 
@@ -67,8 +55,7 @@ class MarkService(private val dataHandler: DataHandler, private val mySqlProvide
             markInfoToAddAndNotify = markInfoToAddAndNotify,
             markInfoToUpdateAndNotify = markInfoToUpdateAndNotify,
             markInfoToUpdate = markInfoToUpdate,
-            latestMarks = latestMarks,
-            newModules = newModules
+            latestMarks = latestMarks
         )
     }
 
