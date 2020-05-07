@@ -2,7 +2,6 @@ package org.ktugrades.backend
 
 import com.github.jasync.sql.db.asSuspending
 import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder
-import com.google.gson.JsonSerializer
 import org.ktugrades.backend.handlers.DataHandler
 import org.ktugrades.backend.handlers.LoginHandler
 import io.ktor.application.ApplicationEnvironment
@@ -53,6 +52,10 @@ class Dependencies(private val appEnvironment: ApplicationEnvironment, private v
 
     val mySqlProvider by lazy {
         MySqlProvider(connection = dbConnection)
+    }
+
+    val schedulerService by lazy {
+        SchedulerService()
     }
 }
 

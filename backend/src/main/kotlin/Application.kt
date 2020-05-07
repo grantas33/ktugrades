@@ -15,8 +15,7 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.serialization.json
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.coroutines.launch
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ktugrades.common.*
 import org.slf4j.LoggerFactory
@@ -25,8 +24,7 @@ import java.security.Security
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-@kotlin.jvm.JvmOverloads
-fun Application.module(testing: Boolean = false) {
+fun Application.module() {
     Security.addProvider(BouncyCastleProvider())
     val dependencies = Dependencies(environment, jsonSerializer)
     val logger = LoggerFactory.getLogger("app")
@@ -93,10 +91,15 @@ fun Application.module(testing: Boolean = false) {
             dependencies.mySqlProvider.deleteUserSubscription(payload)
             call.respond(HttpStatusCode.OK)
         }
-        post("/broadcast") {
-            dependencies.notificationService.broadcastToAll {
-                logger.warn(it.localizedMessage)
-            }
+    }
+
+    dependencies.schedulerService.runEveryInterval(minutes = 30) {
+        launch {
+            dependencies.notificationService.broadcastToAll(
+                onSingleUserError =  { logger.warn(it.localizedMessage) }
+            )
         }
     }
 }
+
+
