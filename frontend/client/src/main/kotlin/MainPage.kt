@@ -66,6 +66,7 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
     }
 
     override fun RBuilder.render() {
+        child(functionalComponent = Grades)
         if (state.pushManagerState != PushManagerState.Loading) {
             child(
                 functionalComponent = Logout,
@@ -77,8 +78,6 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
                 }
             )
         }
-
-        child(functionalComponent = Grades)
         if (state.pushManagerState == PushManagerState.NotSubscribed) {
             div {
                 appButton {
