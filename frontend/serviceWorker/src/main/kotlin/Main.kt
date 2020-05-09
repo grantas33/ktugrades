@@ -26,7 +26,6 @@ fun installServiceWorker() {
             "/index.html",
             "/main.bundle.js",
             "/ktu-ikona.png",
-            "manifest.webmanifest",
             "PfdintextproMedium.ttf"
     )
 

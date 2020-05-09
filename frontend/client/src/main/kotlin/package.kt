@@ -22,7 +22,7 @@ sealed class ServiceWorkerState {
 }
 
 enum class PushManagerState {
-    Loading, Subscribed, NotSubscribed
+    Loading, Subscribed, NotSubscribed, NotSupported
 }
 
 data class PushSubscriptionOptions(val userVisibleOnly: Boolean, val applicationServerKey: Uint8Array)
@@ -42,13 +42,13 @@ fun PushSubscription.getAuthForRequest(): String = getKey(name = "auth").convert
 
 fun ArrayBuffer.convertToString(): String = window.btoa(js("String").fromCharCode.apply(null, Uint8Array(this)) as String)
 
-inline val ServiceWorkerRegistration.pushManager: PushManager
-    get() = asDynamic().pushManager as PushManager
+inline val ServiceWorkerRegistration.pushManager: PushManager?
+    get() = asDynamic().pushManager.unsafeCast<PushManager?>()
 
 /**
  * Exposes the JavaScript [PushManager](https://developer.mozilla.org/en-US/docs/Web/API/PushManager) to Kotlin
  */
-external class PushManager {
+external interface PushManager {
     fun getSubscription(): Promise<PushSubscription?>
     fun permissionState(): Promise<String>
     fun subscribe(options: PushSubscriptionOptions): Promise<PushSubscription>

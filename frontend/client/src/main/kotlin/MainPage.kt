@@ -14,30 +14,34 @@ import styled.css
 import kotlin.browser.window
 
 interface MainPageProps: RProps, CacheProps {
-    var pushManager: PushManager
+    var pushManager: PushManager?
 }
 interface MainPageState: RState {
     var pushManagerState: PushManagerState
-    var errorMessage: String
 }
 
 class MainPage: RComponent<MainPageProps, MainPageState>() {
 
     override fun MainPageState.init() {
-        pushManagerState = PushManagerState.Loading
+        if (props?.pushManager != null) {
+            pushManagerState = PushManagerState.Loading
 
-        MainScope().launch {
-            props.pushManager.getSubscription().await().let {
-                setState {
-                    pushManagerState = if (it != null) PushManagerState.Subscribed else PushManagerState.NotSubscribed
+            MainScope().launch {
+                props.pushManager!!.getSubscription().await().let {
+                    setState {
+                        pushManagerState = if (it != null) PushManagerState.Subscribed else PushManagerState.NotSubscribed
+                    }
                 }
             }
+        } else {
+            pushManagerState = PushManagerState.NotSupported
         }
+
     }
 
     private fun subscribeUser() = GlobalScope.launch {
         try {
-            val subscription = props.pushManager.subscribe(
+            val subscription = props.pushManager!!.subscribe(
                 PushSubscriptionOptions(userVisibleOnly = true, applicationServerKey = PUSH_API_PUBLIC_KEY)
             ).await()
             sendSubscriptionToServer(subscription)
