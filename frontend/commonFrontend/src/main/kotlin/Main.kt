@@ -2,7 +2,7 @@ import org.ktugrades.common.MarkInfoResponse
 
 const val CACHE_USERNAME = "username"
 const val DATA_CACHE = "dataCache"
-const val SERVER_URL = "http://127.0.0.1:5000"
+const val SERVER_URL = ""
 
 inline fun jsObject(init: dynamic.() -> Unit): dynamic {
     val o = js("{}")

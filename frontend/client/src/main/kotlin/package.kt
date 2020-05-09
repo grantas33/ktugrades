@@ -13,8 +13,6 @@ val PUSH_API_PUBLIC_KEY = "04:b4:64:c9:1a:7e:0e:b2:86:83:78:a0:97:92:bc:cb:84:72
         Uint8Array(it.map { it.toInt(16).toByte() }.toTypedArray())
     }
 
-const val SERVER_URL = "http://127.0.0.1:5000"
-
 sealed class ServiceWorkerState {
     data class Registered(val swRegistration: ServiceWorkerRegistration): ServiceWorkerState()
     object Failed: ServiceWorkerState()
