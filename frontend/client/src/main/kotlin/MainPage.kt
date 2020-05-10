@@ -23,20 +23,19 @@ interface MainPageState: RState {
 class MainPage: RComponent<MainPageProps, MainPageState>() {
 
     override fun MainPageState.init() {
-        if (props?.pushManager != null) {
-            pushManagerState = PushManagerState.Loading
-
-            MainScope().launch {
+        MainScope().launch {
+            console.log(props)
+            if (props.pushManager != null) {
+                pushManagerState = PushManagerState.Loading
                 props.pushManager!!.getSubscription().await().let {
                     setState {
                         pushManagerState = if (it != null) PushManagerState.Subscribed else PushManagerState.NotSubscribed
                     }
                 }
+            } else {
+                pushManagerState = PushManagerState.NotSupported
             }
-        } else {
-            pushManagerState = PushManagerState.NotSupported
         }
-
     }
 
     private fun subscribeUser() = GlobalScope.launch {
