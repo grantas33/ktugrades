@@ -112,7 +112,7 @@ fun installServiceWorker() {
         console.log("Notification click received.")
         event.notification.close()
         event.waitUntil(
-            self.clients.openWindow("localhost:8080")
+            self.clients.openWindow(CLIENT_URL)
         )
     })
 }

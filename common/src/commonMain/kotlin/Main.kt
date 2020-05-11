@@ -82,6 +82,7 @@ data class MarkInfoResponse(
     val typeId: String?,
     val week: String,
     val date: CommonDateTime,
+    val averageMarkForModule: Double?,
     val marks: List<String>
 )
 

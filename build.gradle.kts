@@ -76,7 +76,7 @@ tasks.register("refreshDatabaseTables") {
         	semesterCode varchar(255) not null,
         	typeId varchar(32) null,
         	week varchar(32) not null,
-            averageMark float null,
+            averageMark double null,
         	constraint MarkSlot_pk
         		primary key (moduleCode, semesterCode, typeId, week),
             constraint MarkSlot_Module_code_semesterNumber_fk

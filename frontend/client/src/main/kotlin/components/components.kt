@@ -1,6 +1,6 @@
 package components
 
-import MarkType
+import MarkTypeInfo
 import kotlinx.css.*
 import kotlinx.html.BUTTON
 import kotlinx.html.DIV
@@ -9,6 +9,8 @@ import org.ktugrades.common.toMarkString
 import react.RBuilder
 import react.ReactElement
 import react.dom.RDOMBuilder
+import react.dom.br
+import round
 import styled.StyledDOMBuilder
 import styled.css
 import styled.styledButton
@@ -89,22 +91,33 @@ fun RBuilder.moduleComponent(module: Module) = styledDiv {
     }
 }
 
-fun RBuilder.typeComponent(type: MarkType) = styledDiv {
+fun RBuilder.typeComponent(type: MarkTypeInfo) = styledDiv {
     css {
         display = Display.flex
         flexDirection = FlexDirection.column
     }
     styledDiv {
         css {
-            fontSize = LinearDimension("2.5rem")
+            display = Display.flex
+            alignItems = Align.baseline
         }
-        +(type.typeId ?: "-")
+        styledDiv {
+            css {
+                fontSize = LinearDimension("2rem")
+                marginRight = LinearDimension("2px")
+            }
+            +(type.typeId ?: "-")
+        }
+        styledDiv {
+            +"${if (type.weeks.split("-").size > 1) "weeks" else "week"} ${type.weeks}"
+        }
     }
     styledDiv {
         css {
+            fontSize = LinearDimension("1.5rem")
             whiteSpace = WhiteSpace.nowrap
         }
-        +"${if (type.weeks.split("-").size > 1) "Weeks" else "Week"} ${type.weeks}"
+        type.averageMark?.let { +"Average: ${it.round(2)}" }
     }
 }
 

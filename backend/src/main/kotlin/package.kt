@@ -14,12 +14,10 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 import org.joda.time.DateTime
 import org.ktugrades.common.CommonDateTime
 import org.ktugrades.common.MarkInfoResponse
-import org.ktugrades.common.Module
 import java.io.InputStreamReader
 import java.nio.ByteBuffer
 import java.security.KeyPair
 import java.util.*
-import javax.management.monitor.StringMonitor
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
@@ -90,6 +88,7 @@ data class MarkInfo(
     val typeId: String?,
     val week: String,
     val date: DateTime,
+    val averageMarkForModule: Double?,
     val marks: List<String>
 )
 
@@ -101,6 +100,7 @@ fun MarkInfo.toResponse(): MarkInfoResponse = MarkInfoResponse(
     typeId = typeId,
     week = week,
     date = CommonDateTime(this.date.millis),
+    averageMarkForModule = averageMarkForModule,
     marks = marks
 )
 
@@ -109,7 +109,7 @@ data class MarkSlot(
     val semesterCode: String,
     val typeId: String?,
     val week: String,
-    val averageMark: Float?
+    val averageMark: Double?
 )
 
 fun UUID.getBytes(): ByteArray = ByteBuffer.wrap(ByteArray(16)).let {

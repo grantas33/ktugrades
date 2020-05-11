@@ -1,7 +1,7 @@
 package components
 
 import MarkState
-import MarkType
+import MarkTypeInfo
 import SERVER_URL
 import hooks.useMobileView
 import io.ktor.client.call.receive
@@ -78,7 +78,7 @@ val Grades = functionalComponent<GradesProps> {
                                     width = LinearDimension("100%")
                                     alignItems = Align.center
                                 }
-                                typeComponent(MarkType(it.typeId, it.week))
+                                typeComponent(MarkTypeInfo(it.typeId, it.week, it.averageMarkForModule))
                                 +it.date.getFormatted()
                             }
                         }
@@ -98,7 +98,7 @@ val Grades = functionalComponent<GradesProps> {
                             styledTr {
                                 styledTd { markComponent(it.marks) }
                                 styledTd { moduleComponent(Module(it.moduleCode, it.semesterCode, it.title, it.professor)) }
-                                styledTd { typeComponent(MarkType(it.typeId, it.week)) }
+                                styledTd { typeComponent(MarkTypeInfo(it.typeId, it.week, it.averageMarkForModule)) }
                                 styledTd { +it.date.getFormatted() }
                             }
                         }

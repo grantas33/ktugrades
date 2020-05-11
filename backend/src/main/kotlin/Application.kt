@@ -94,6 +94,10 @@ fun Application.module() {
 
     dependencies.schedulerService.runEveryInterval(minutes = 30) {
         launch {
+            dependencies.mySqlProvider.apply {
+                val markSlotAverages = getAverageMarks()
+                insertMarkSlotAverages(markSlotAverages)
+            }
             dependencies.notificationService.broadcastToAll(
                 onSingleUserError =  { logger.warn(it.localizedMessage) }
             )

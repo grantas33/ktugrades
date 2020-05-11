@@ -6,6 +6,7 @@ import org.w3c.workers.ServiceWorkerRegistration
 import services.isKeyExistingInCache
 import kotlin.browser.window
 import kotlin.js.Promise
+import kotlin.math.round
 
 val PUSH_API_PUBLIC_KEY = "04:b4:64:c9:1a:7e:0e:b2:86:83:78:a0:97:92:bc:cb:84:72:20:b8:82:53:7c:bc:16:13:ab:ce:5d:91:c3:d6:7e:19:2c:c5:28:3b:73:69:1e:f2:a8:3f:7f:b1:9d:d8:85:e9:80:93:df:85:b9:c6:d6:a7:27:94:c0:2b:7d:bb:c0"
     .split(":")
@@ -40,6 +41,12 @@ fun PushSubscription.getAuthForRequest(): String = getKey(name = "auth").convert
 
 fun ArrayBuffer.convertToString(): String = window.btoa(js("String").fromCharCode.apply(null, Uint8Array(this)) as String)
 
+fun Double.round(decimals: Int): Double {
+    var multiplier = 1.0
+    repeat(decimals) { multiplier *= 10 }
+    return round(this * multiplier) / multiplier
+}
+
 inline val ServiceWorkerRegistration.pushManager: PushManager?
     get() = asDynamic().pushManager.unsafeCast<PushManager?>()
 
@@ -54,7 +61,7 @@ external interface PushManager {
 
 suspend fun isCredentialsExisting() = window.caches.isKeyExistingInCache(DATA_CACHE, CACHE_USERNAME)
 
-data class MarkType(val typeId: String?, val weeks: String)
+data class MarkTypeInfo(val typeId: String?, val weeks: String, val averageMark: Double?)
 
 sealed class MarkState {
     data class Success(val marks: List<MarkInfoResponse>): MarkState()

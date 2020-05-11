@@ -2,7 +2,6 @@ package org.ktugrades.backend.services
 
 import com.github.jasync.sql.db.SuspendingConnection
 import com.github.jasync.sql.db.util.length
-import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
 import org.ktugrades.backend.*
 import org.ktugrades.common.Module
@@ -89,7 +88,7 @@ class MySqlProvider(val connection: SuspendingConnection) {
     suspend fun getMarksForUser(username: ByteArray): List<MarkInfo> = connection.inTransaction {
         it.sendPreparedStatement(
             query = """
-                select MarkInformation.*, Module.title, Module.professor, group_concat(Mark.mark) as `marks` from MarkInformation
+                select MarkInformation.*, Module.title, Module.professor, MarkSlot.averageMark, group_concat(Mark.mark) as `marks` from MarkInformation
                 join MarkSlot on MarkInformation.moduleCode = MarkSlot.moduleCode 
                     and MarkInformation.semesterCode = MarkSlot.semesterCode
                     and MarkInformation.typeId = MarkSlot.typeId
@@ -108,9 +107,10 @@ class MySqlProvider(val connection: SuspendingConnection) {
                     semesterCode = it["semesterCode"] as String,
                     title = it["title"] as String,
                     professor = it["professor"] as String,
-                    typeId = it["typeId"] as String,
+                    typeId = it["typeId"] as String?,
                     week = it["week"] as String,
                     date = (it["date"] as LocalDateTime).toDateTime(),
+                    averageMarkForModule = it["averageMark"] as Double?,
                     marks = (it["marks"] as String).split(",")
                 )
             }
@@ -185,5 +185,37 @@ class MySqlProvider(val connection: SuspendingConnection) {
                 values = marks.map { markInfo ->  markInfo.marks.map { listOf(UUID.randomUUID().getBytes(), markInfo.id.getBytes(), it) }.flatten()}.flatten()
             )
         }
+    }
+
+    suspend fun getAverageMarks(): List<MarkSlot> = connection.inTransaction {
+        it.sendPreparedStatement(
+            query = """
+                select MarkInformation.moduleCode, MarkInformation.semesterCode, MarkInformation.typeId, MarkInformation.week, avg(Mark.mark) as `avg`
+                from MarkInformation join Mark on MarkInformation.id = Mark.markInformationId
+                where Mark.mark REGEXP '^[0-9]+$'
+                group by MarkInformation.moduleCode, MarkInformation.semesterCode, MarkInformation.typeId, MarkInformation.week
+            """.trimIndent()
+        ).let {
+            it.rows.map {
+                MarkSlot(
+                    moduleCode = it["moduleCode"] as String,
+                    semesterCode = it["semesterCode"] as String,
+                    typeId = it["typeId"] as String?,
+                    week = it["week"] as String,
+                    averageMark = it["avg"] as Double?
+                )
+            }
+        }
+    }
+
+    suspend fun insertMarkSlotAverages(markSlots: List<MarkSlot>) = connection.inTransaction {
+        it.sendPreparedStatement(
+            query = """
+                insert into MarkSlot (moduleCode, semesterCode, typeId, week, averageMark) 
+                values ${markSlots.joinToString(", ") { "(?, ?, ?, ?, ?)" }}
+                on duplicate key update averageMark=values(averageMark)
+            """.trimIndent(),
+            values = markSlots.map { listOf(it.moduleCode, it.semesterCode, it.typeId, it.week, it.averageMark )}.flatten()
+        )
     }
 }

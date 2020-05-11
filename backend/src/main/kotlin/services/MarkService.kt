@@ -25,6 +25,7 @@ class MarkService(private val dataHandler: DataHandler, private val mySqlProvide
                         typeId = it.typeId,
                         week = it.week,
                         date = currentDate,
+                        averageMarkForModule = null,
                         marks = it.mark.filter { it.isNotBlank() }
                     )
                 }
@@ -41,10 +42,10 @@ class MarkService(private val dataHandler: DataHandler, private val mySqlProvide
             when {
                 replica == null -> markInfoToAddAndNotify.add(curr)
                 replica.marks.containsAll(curr.marks).not() -> markInfoToUpdateAndNotify.add(
-                    replica.copy(typeId = curr.typeId, date = currentDate, marks = curr.marks)
+                    replica.copy(date = currentDate, marks = curr.marks)
                 )
                 curr.marks.containsAll(replica.marks).not()  ->
-                    markInfoToUpdate.add(replica.copy(typeId = curr.typeId, marks = curr.marks))
+                    markInfoToUpdate.add(replica.copy(marks = curr.marks))
             }
         }
 
