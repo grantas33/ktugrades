@@ -24,7 +24,6 @@ class MainPage: RComponent<MainPageProps, MainPageState>() {
 
     override fun MainPageState.init() {
         MainScope().launch {
-            console.log(props)
             if (props.pushManager != null) {
                 pushManagerState = PushManagerState.Loading
                 props.pushManager!!.getSubscription().await().let {
