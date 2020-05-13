@@ -65,7 +65,7 @@ class DataHandler {
             getModuleMarkList(it)
         }.flatten()
 
-    suspend fun getModules(planYear: String, studId: String): List<ModuleModel> {
+    private suspend fun getModules(planYear: String, studId: String): List<ModuleModel> {
         val url = "https://uais.cr.ktu.lt/ktuis/STUD_SS2.planas_busenos?" +
                 "plano_metai=$planYear&" +
                 "p_stud_id=$studId"

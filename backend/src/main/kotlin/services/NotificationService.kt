@@ -10,6 +10,8 @@ import org.ktugrades.backend.withCoroutineClient
 import org.ktugrades.common.NotificationPayload
 import java.lang.RuntimeException
 
+typealias ErrorAction = (e: java.lang.Exception) -> Unit
+
 class NotificationService(
     private val mySqlProvider: MySqlProvider,
     private val credentialProvider: CredentialProvider,
@@ -18,7 +20,7 @@ class NotificationService(
     private val jsonSerializer: Json
 ) {
 
-    suspend fun broadcastToAll(onSingleUserError: (e: java.lang.Exception) -> Unit) {
+    suspend fun broadcastToAll(onSingleUserError: ErrorAction) {
         val vapidKeyPair = getVapidKeyPair() ?: throw RuntimeException("Could not get VAPID key pair.")
         val pushService = PushService().apply {
             publicKey = vapidKeyPair.public

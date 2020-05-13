@@ -3,8 +3,10 @@ package org.ktugrades.backend.services
 import org.ktugrades.backend.User
 import org.ktugrades.common.Credentials
 
+typealias CredentialUserProvider = suspend (encryptedUsername: ByteArray) -> User
+
 class CredentialProvider(
-    private val userProvider: suspend (encryptedUsername: ByteArray) -> User,
+    private val userProvider: CredentialUserProvider,
     private val encryptionService: EncryptionService
 ) {
     suspend fun getCredentials(encryptedUsername: ByteArray): Credentials {

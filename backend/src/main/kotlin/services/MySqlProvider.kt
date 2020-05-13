@@ -10,7 +10,7 @@ import org.ktugrades.common.UnsubscriptionPayload
 import java.lang.RuntimeException
 import java.util.*
 
-class MySqlProvider(val connection: SuspendingConnection) {
+class MySqlProvider(private val connection: SuspendingConnection) {
 
     suspend fun getUser(username: ByteArray): User = connection.inTransaction {
         it.sendPreparedStatement(
