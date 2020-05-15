@@ -118,7 +118,9 @@ fun UUID.getBytes(): ByteArray = ByteBuffer.wrap(ByteArray(16)).let {
 }.array()
 
 fun ByteArray.getUUID(): UUID = ByteBuffer.wrap(this).run { UUID(long, long) }
+fun String.toFixedByteArray(size: Int) = this.toByteArray().plus(ByteArray(size = size - this.length))
 
+data class UserSubscription(val id: UUID, val userId: UUID, val endpoint: String, val publicKey: String, val auth: String)
 data class UserSubscriptionData(val user: User, val subscriptions: List<SubscriptionData>)
 
 data class SubscriptionData(val endpoint: String, val publicKey: String, val auth: String)

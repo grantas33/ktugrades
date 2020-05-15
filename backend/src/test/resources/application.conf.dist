@@ -1,0 +1,11 @@
+database {
+    url = ""
+    driver = ""
+    user = ""
+    password = ""
+}
+
+testUser = {
+    username = ""
+    password = ""
+}

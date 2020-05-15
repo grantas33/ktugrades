@@ -51,7 +51,7 @@ class Dependencies(private val appEnvironment: ApplicationEnvironment, private v
     }
 
     val mySqlProvider by lazy {
-        MySqlProvider(connection = dbConnection)
+        MySqlProvider(connection = dbConnection, queryProvider = MySqlQueryProvider())
     }
 
     val schedulerService by lazy {
