@@ -65,10 +65,10 @@ data class SubscriptionPayload(val username: ByteArray, val endpoint: String, va
 @Serializable
 data class UnsubscriptionPayload(val endpoint: String, val key: String, val auth: String)
 
-@Serializable(with = CommonDateTimeSerializer::class)
-expect class CommonDateTime(millis: Long) {
-    fun getFormatted(): String
-}
+@Serializable
+class CommonDateTime(val millis: Long)
+
+expect fun CommonDateTime.getFormatted(): String
 
 @Serializer(forClass = CommonDateTime::class)
 object CommonDateTimeSerializer
@@ -100,3 +100,10 @@ data class NotificationPayload(
 )
 
 fun List<String>.toMarkString() = this.joinToString(", ") { it.removePrefix("0") }
+
+fun List<MarkInfoResponse>.sort() = this
+    .sortedWith(compareByDescending<MarkInfoResponse> {it.date.millis}
+        .thenByDescending {it.semesterCode }
+        .thenByDescending {it.week.split("-").map {it.toInt()}.average()}
+        .thenBy {it.title}
+    )

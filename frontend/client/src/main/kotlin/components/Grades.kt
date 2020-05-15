@@ -18,7 +18,6 @@ import react.dom.h1
 import react.dom.tbody
 import react.dom.thead
 import services.getUsername
-import sort
 import styled.*
 import kotlin.browser.window
 

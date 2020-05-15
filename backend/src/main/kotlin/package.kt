@@ -76,7 +76,7 @@ data class MarkAggregationResult(
     val markInfoToAddAndNotify: List<MarkInfo>,
     val markInfoToUpdateAndNotify: List<MarkInfo>,
     val markInfoToUpdate: List<MarkInfo>,
-    val latestMarks: List<MarkInfo>
+    val latestMarks: List<MarkInfoResponse>
 )
 
 data class MarkInfo(

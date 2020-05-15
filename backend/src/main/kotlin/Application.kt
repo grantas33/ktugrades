@@ -74,7 +74,7 @@ fun Application.module() {
                         mySqlProvider.updateMarks(it.markInfoToUpdate + it.markInfoToUpdateAndNotify, encrypted.username)
                         call.respond(
                             status = HttpStatusCode.OK,
-                            message = it.latestMarks.map { it.toResponse() }
+                            message = it.latestMarks
                         )
                     }
                 }
