@@ -7,6 +7,11 @@
       "src": "ktu-ikona.png",
       "type": "image/png",
       "sizes": "192x192"
+    },
+    {
+      "src": "ktu-ikona-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
   "start_url": "/",
