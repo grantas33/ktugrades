@@ -1,4 +1,5 @@
 [mysqld]
+performance_schema = 0
 default-storage-engine=InnoDB
 innodb_file_format=barracuda
 innodb_file_per_table=1
