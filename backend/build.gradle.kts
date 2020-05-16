@@ -12,10 +12,21 @@ object Versions {
     const val coroutines = "1.3.5"
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("com.github.jengelman.gradle.plugins:shadow:5.2.0")
+    }
+}
+
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     application
+    id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
 repositories {
