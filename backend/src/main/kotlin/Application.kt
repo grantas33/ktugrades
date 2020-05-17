@@ -53,7 +53,10 @@ fun Application.module() {
 
     routing {
         post(Routes.Authenticate) {
-            val credentials = call.receive<Credentials>()
+            val credentials = call.receive<Credentials>().let {
+                it.copy(username = it.username.toLowerCase())
+            }
+
             withCoroutineClient {
                 dependencies.loginHandler.getAuthCookie(credentials.username, credentials.password)
             }
