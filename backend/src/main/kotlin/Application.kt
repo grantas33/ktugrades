@@ -95,7 +95,7 @@ fun Application.module() {
         }
     }
 
-    dependencies.schedulerService.runEveryInterval(minutes = 30) {
+    dependencies.schedulerService.runEveryInterval(minutes = 1) {
         launch {
             dependencies.mySqlProvider.apply {
                 val markSlotAverages = getAverageMarks()

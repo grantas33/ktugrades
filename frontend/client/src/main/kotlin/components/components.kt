@@ -4,17 +4,18 @@ import MarkTypeInfo
 import kotlinx.css.*
 import kotlinx.html.BUTTON
 import kotlinx.html.DIV
+import moduleScienceTypeMap
 import org.ktugrades.common.Module
 import org.ktugrades.common.toMarkString
 import react.RBuilder
 import react.ReactElement
 import react.dom.RDOMBuilder
-import react.dom.br
 import round
 import styled.StyledDOMBuilder
 import styled.css
 import styled.styledButton
 import styled.styledDiv
+import moduleTypeMap
 
 fun RBuilder.flexBox(block: RDOMBuilder<DIV>.() -> Unit) = styledDiv {
     css {
@@ -55,6 +56,7 @@ fun RBuilder.markComponent(marks: List<String>): ReactElement {
     return styledDiv {
         css {
             fontSize = LinearDimension("4rem")
+            textAlign = TextAlign.center
         }
         + markString
     }
@@ -64,6 +66,11 @@ fun RBuilder.moduleComponent(module: Module) = styledDiv {
     css {
         display = Display.flex
         flexDirection = FlexDirection.column
+        backgroundColor = moduleScienceTypeMap[module.code.first()]?.backgroundColor ?: Color("#FDF0D6")
+        padding = "5px"
+        mobileView {
+            width = LinearDimension("100%")
+        }
     }
     styledDiv {
         css {
@@ -71,6 +78,7 @@ fun RBuilder.moduleComponent(module: Module) = styledDiv {
             mobileView {
                 fontSize = LinearDimension("1.5rem")
                 textAlign = TextAlign.center
+                marginBottom = LinearDimension("5px")
             }
         }
         +module.title
@@ -95,29 +103,44 @@ fun RBuilder.typeComponent(type: MarkTypeInfo) = styledDiv {
     css {
         display = Display.flex
         flexDirection = FlexDirection.column
+        backgroundColor = moduleTypeMap[type.typeId]?.backgroundColor ?: Color("#C8DFF3")
+        padding = "5px"
+        mobileView {
+            width = LinearDimension("100%")
+        }
+    }
+    styledDiv {
+        css {
+            fontSize = LinearDimension("2rem")
+            marginRight = LinearDimension("2px")
+            mobileView {
+                fontSize = LinearDimension("1.5rem")
+                textAlign = TextAlign.center
+                marginBottom = LinearDimension("5px")
+            }
+        }
+        +(moduleTypeMap[type.typeId]?.fullTitle ?: "Written test")
     }
     styledDiv {
         css {
             display = Display.flex
+            flexDirection = FlexDirection.row
+            whiteSpace = WhiteSpace.nowrap
             alignItems = Align.baseline
+            justifyContent = JustifyContent.spaceBetween
         }
         styledDiv {
             css {
-                fontSize = LinearDimension("2rem")
-                marginRight = LinearDimension("2px")
+                fontSize = LinearDimension("1.5rem")
+                mobileView {
+                    fontSize = LinearDimension("1rem")
+                }
             }
-            +(type.typeId ?: "-")
+            type.averageMark?.let { +"Average: ${it.round(2)}" }
         }
         styledDiv {
             +"${if (type.weeks.split("-").size > 1) "weeks" else "week"} ${type.weeks}"
         }
-    }
-    styledDiv {
-        css {
-            fontSize = LinearDimension("1.5rem")
-            whiteSpace = WhiteSpace.nowrap
-        }
-        type.averageMark?.let { +"Average: ${it.round(2)}" }
     }
 }
 

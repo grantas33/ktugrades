@@ -70,14 +70,12 @@ val Grades = functionalComponent<GradesProps> {
                             }
                             markComponent(it.marks)
                             moduleComponent(Module(it.moduleCode, it.semesterCode, it.title, it.professor))
+                            typeComponent(MarkTypeInfo(it.typeId, it.week, it.averageMarkForModule))
                             styledDiv {
                                 css {
-                                    display = Display.flex
-                                    justifyContent = JustifyContent.spaceBetween
-                                    width = LinearDimension("100%")
-                                    alignItems = Align.center
+                                    textAlign = TextAlign.center
+                                    marginTop = LinearDimension("10px")
                                 }
-                                typeComponent(MarkTypeInfo(it.typeId, it.week, it.averageMarkForModule))
                                 +it.date.getFormatted()
                             }
                         }
@@ -86,10 +84,22 @@ val Grades = functionalComponent<GradesProps> {
                 else -> styledTable {
                     thead {
                         styledTr {
-                            styledTh { +"Mark" }
-                            styledTh { +"Module" }
-                            styledTh { +"Type" }
-                            styledTh { +"Date" }
+                            styledTh {
+                                css { borderBottom = "2px solid #000101" }
+                                +"Mark"
+                            }
+                            styledTh {
+                                css { borderBottom = "2px solid #000101" }
+                                +"Module"
+                            }
+                            styledTh {
+                                css { borderBottom = "2px solid #000101" }
+                                +"Type"
+                            }
+                            styledTh {
+                                css { borderBottom = "2px solid #000101" }
+                                +"Date"
+                            }
                         }
                     }
                     tbody {

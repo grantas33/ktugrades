@@ -69,7 +69,7 @@ val Logout = functionalComponent<LogoutProps> { props ->
         css {
             position = Position.absolute
             top = LinearDimension("10px")
-            right = LinearDimension("12%")
+            right = LinearDimension("1%")
             mobileView {
                 right = LinearDimension("10px")
             }
